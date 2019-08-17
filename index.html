@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="filter-container">
+        <p>YEAR</p>
+        <input id="firstYear" class="nba-filter" type="number" placeholder="Firt Year" min="1950" max="2017" value="2007">
+        <input id="endYear" class="nba-filter" type="number" placeholder="End Year" min="1950" max="2017" value="2008">
+        <br> Color Year
+        <input id="colorYear" class="nba-filter" type="checkbox" value="1">
+        <br> Color Player
+        <input id="colorPlayer" class="nba-filter" type="checkbox" value="1">
+        <p>AGE</p>
+        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="17" max="40" value="24">
+        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="17" max="40" value="24">
+        <p>PLAYER</p>
+        <select id="playerSelector" class="nba-filter">
+            <option value="NA">NA</option>
+        </select>
+        <br>
+        <br>
+        <button onclick="changeData()">Change Data</button>
+    </div>
+    <div id="chartdiv"></div>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="amcharts4/core.js"></script>
+    <script src="amcharts4/charts.js"></script>
+    <script src="amcharts4/themes/animated.js"></script>
+    <script src="data.js"></script>
+    <script src="vis.js"></script>
+
+</body>
+
+</html>
