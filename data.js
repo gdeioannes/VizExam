@@ -10,7 +10,13 @@ var teamColor = [
  },
     {
         "from": "CHS",
-        "color": "#C0B6EF"
+        "color": "#C0B6EF",
+        "x": 100,
+        "y": 200,
+        "chaW": 4,
+        "wtl": 2,
+        "wth": 30,
+        "avgP": 10000000
  },
     {
         "from": "DNN",

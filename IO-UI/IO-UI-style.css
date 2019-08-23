@@ -1,0 +1,113 @@
+body {
+    position: relative;
+    margin: auto;
+    width: 70%;
+}
+
+input,
+button,
+submit {
+    border: none;
+}
+
+.IO-UI-input-bar-container {
+    margin-top: 50px;
+    text-align: center;
+}
+
+.IO-UI-input-bar {
+    z-index: -2;
+    position: absolute;
+    background-color: #CCCCCC;
+    left: 0;
+    right: 0;
+    height: 10px;
+    border-radius: 10px;
+}
+
+.IO-UI-token-container {
+    position: absolute;
+}
+
+.IO-UI-token {
+    position: fixed;
+    border-radius: 15px;
+    width: 18px;
+    height: 18px;
+    background-color: #CCCCCC;
+}
+
+.IO-UI-token {
+    background: red;
+}
+
+.IO-UI-input-add-range-btn,
+.IO-UI-delete-btn {
+    border-radius: 25px;
+    margin-bottom: 20px;
+    background-color: #CCCCCC;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+
+.IO-UI-token-text {
+    position: fixed;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+#color-picker-container {
+    position: fixed;
+    text-align: center;
+}
+
+.IO-UI-input-info-fade {
+    margin-top: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+
+    animation: signup-response 0.5s 1;
+    -webkit-animation: signup-response 0.5s 1;
+    animation-fill-mode: forwards;
+
+    animation-delay: 2s;
+    -webkit-animation-delay: 1s;
+    /* Safari and Chrome */
+    -webkit-animation-fill-mode: forwards;
+}
+
+@keyframes signup-response {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes signup-response {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.IO-UI-input-info {
+    margin-top: 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+.IO-UI-range {
+    z-index: -1;
+    opacity: 0.5;
+    position: fixed;
+    border-radius: 15px;
+    width: 180px;
+    height: 24px;
+    background-color: #AAA;
+}

@@ -9,7 +9,21 @@
 </head>
 
 <body>
+    <div class="slide-bar-container">
+        <div class="slide-bar"></div>
+        <div class="slide-bar-toggle-container">
+            <div class="slide-bar-token">
+                <p>100</p>
+            </div>
+            <div class="slide-bar-token">
+                100
+            </div>
+        </div>
+    </div>
+
+
     <div class="filter-container">
+
         <p>YEAR</p>
         <input id="firstYear" class="nba-filter" type="number" placeholder="Firt Year" min="1950" max="2017" value="1950">
         <input id="endYear" class="nba-filter" type="number" placeholder="End Year" min="1950" max="2017" value="2017">
@@ -18,15 +32,21 @@
         <br> Color Player
         <input id="colorPlayer" class="nba-filter" type="checkbox" value="1">
         <p>AGE</p>
-        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="17" max="40" value="17">
-        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="17" max="40" value="50">
+        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="17" max="50" value="17">
+        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="17" max="50" value="50">
         <p>PLAYER</p>
         <select id="playerSelector" class="nba-filter">
             <option value="NA">NA</option>
         </select>
         <br>
+        <button id="nextPage10"> 10+ </button><button id="nextPage">+</button><button id="prevPage">-</button><button id="prevPage10">-10</button>
         <br>
-        <button onclick="changeData()">Change Data</button>
+        <br>
+        <p>Arrage Teams By</p>
+        <input class="nba-filter" type="radio" name="arrage" value="age" checked> Old-Young<br>
+        <input class="nba-filter" type="radio" id="connectionArrange" name="arrage" value="connection"> Connections<br>
+
+        <!--<button onclick="changeData()">Change Data</button>-->
     </div>
     <canvas id="myCanvas" />
     <script src="jquery-3.4.1.min.js"></script>

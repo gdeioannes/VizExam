@@ -21,7 +21,7 @@ chart.colors.saturation = 0.45;
 chart.colors.step = 3;
 
 var colors = {
-        SO: "#000"
+    SO: "#000"
 
 }
 
