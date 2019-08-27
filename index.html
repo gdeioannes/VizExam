@@ -9,6 +9,27 @@
 </head>
 
 <body>
+    <div class="IO-UI-input-bar-container">
+        <div id="IO-UI-input-info-text">
+            <p class="IO-UI-input-info-fade">Here goes the info!</p>
+        </div>
+        <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD RANGE</button>
+        <!--<button class="IO-UI-input-add-range-btn" id="IO-UI-add-range">ADD RANGE</button>-->
+        <div class="IO-UI-input-bar"></div>
+        <div class="IO-UI-token-container">
+            <div class="IO-UI-range">
+                <div class="IO-UI-token" data-year="1960">
+                    <p class="IO-UI-token-text">100</p>
+                </div>
+                <div class="IO-UI-token" data-year="2008">
+                    <p class="IO-UI-token-text">100</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
+
+
     <div class="filter-container">
         <p>YEAR</p>
         <input id="firstYear" class="nba-filter" type="number" placeholder="Firt Year" min="1950" max="2017" value="2007">
@@ -36,6 +57,10 @@
     <script src="data.js"></script>
     <script src="vis.js"></script>
 
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="color-picker-master/iro.min.js"></script>
+    <script src="IO-UI.js"></script>
 </body>
 
 </html>

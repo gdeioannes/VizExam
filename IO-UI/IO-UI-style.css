@@ -1,17 +1,17 @@
-body {
-    position: relative;
-    margin: auto;
-    width: 70%;
-}
-
 input,
 button,
 submit {
     border: none;
 }
 
+.IO-UI-main-container {
+    position: relative;
+    margin: auto;
+    width: 50%;
+    margin-bottom: 10px;
+}
+
 .IO-UI-input-bar-container {
-    margin-top: 50px;
     text-align: center;
 }
 
@@ -30,6 +30,7 @@ submit {
 }
 
 .IO-UI-token {
+    margin-right: -9px;
     position: fixed;
     border-radius: 15px;
     width: 18px;
@@ -56,6 +57,7 @@ submit {
     position: fixed;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
+    background: #FFF;
 }
 
 #color-picker-container {
@@ -64,7 +66,6 @@ submit {
 }
 
 .IO-UI-input-info-fade {
-    margin-top: 30px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
 
@@ -97,14 +98,13 @@ submit {
 }
 
 .IO-UI-input-info {
-    margin-top: 30px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
 }
 
 .IO-UI-range {
     z-index: -1;
-    opacity: 0.5;
+    opacity: 0.75;
     position: fixed;
     border-radius: 15px;
     width: 180px;

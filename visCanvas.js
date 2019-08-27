@@ -1,4 +1,5 @@
 var dataArray = [];
+var namePlayer = false;
 changeData();
 
 var saveSelectorValue = "";
@@ -106,11 +107,14 @@ function draw() {
             var max = Math.max(saveFromX, saveToX);
             var min = Math.min(saveFromX, saveToX);
             var mid = Math.min(saveFromX, saveToX) + (Math.max(saveFromX, saveToX) - Math.min(saveFromX, saveToX)) / 2;
+            /*
             if (linewith % 2) {
                 ctx.arc(mid, 575, (max - min) / 2, 0, Math.PI * 1, true);
             } else {
                 ctx.arc(mid, 575, (max - min) / 2, Math.PI * 1, Math.PI * 2, true);
-            }
+            }*/
+
+            ctx.arc(mid, 575, (max - min) / 2, 0, Math.PI * 1, true);
             //ctx.arc(mid, 575, (max - min) / 2, 0, Math.PI * 1, true);
             //ctx.moveTo(Math.min(saveFromX, saveToX), 400);
             //ctx.lineTo(Math.min(saveFromX, saveToX) + (Math.max(saveFromX, saveToX) - Math.min(saveFromX, saveToX)) / 2, (Math.max(saveFromX, saveToX) - Math.min(saveFromX, saveToX)));
@@ -121,7 +125,9 @@ function draw() {
             ctx.textAlign = "center";
             ctx.stroke();
             ctx.fillStyle = "#000";
-            ctx.fillText(dataArray[i].playerName + " " + linewith, mid, 625 - (max - min) / 2);
+            if (namePlayer) {
+                ctx.fillText(dataArray[i].playerName + " " + linewith, mid, 625 - (max - min) / 2);
+            }
 
 
         }
@@ -138,15 +144,15 @@ function Node() {
     this.tradenum = 0;
 }
 
+
+
 function changeData() {
     dataArray = [];
-    var firstYear = parseInt(document.getElementById('firstYear').value);
-    var endYear = parseInt(document.getElementById('endYear').value);
     var firstAge = parseInt(document.getElementById('firstAge').value);
     var endAge = parseInt(document.getElementById('endAge').value);
     var playerSelector = document.getElementById('playerSelector').value;
-    var colorYear = document.getElementById('colorYear').checked;
     var colorPlayer = document.getElementById('colorPlayer').checked;
+    namePlayer = document.getElementById('namePlayer').checked;
     saveSelectorValue = playerSelector;
 
     var playerFlag = true;
@@ -157,69 +163,97 @@ function changeData() {
     }
 
 
+    var dataRangesYear = getDataRanges();
+    for (var ii = 0; ii < dataRangesYear.length; ii++) {
+        dataRangeYear = dataRangesYear[ii];
 
-    for (var i = 0; i < dataModelNames.length; i++) {
-        var saveTeam = "";
-        var connectionnum = 0;
-        for (var j = 0; j < dataModel.length; j++) {
-            if (playerSelector != "NA") {
-                if (playerSelector == dataModel[j].Player) {
-                    playerFlag = true;
-                } else {
-                    playerFlag = false;
+        for (var i = 0; i < dataModelNames.length; i++) {
+            var saveTeam = "";
+            var connectionnum = 0;
+            for (var j = 0; j < dataModel.length; j++) {
+                if (playerSelector != "NA") {
+                    if (playerSelector == dataModel[j].Player) {
+                        playerFlag = true;
+                    } else {
+                        playerFlag = false;
+                    }
                 }
-            }
 
 
-            if (dataModelNames[i].Name == dataModel[j].Player &&
-                dataModel[j].Year >= firstYear && dataModel[j].Year <= endYear &&
-                dataModel[j].Age >= firstAge && dataModel[j].Age <= endAge) {
-                if (dataModel[j].Tm != "TOT" && playerFlag) {
+                if (dataModelNames[i].Name == dataModel[j].Player &&
+                    dataModel[j].Year >= dataRangeYear.from && dataModel[j].Year <= dataRangeYear.to &&
+                    dataModel[j].Age >= firstAge && dataModel[j].Age <= endAge) {
+                    if (dataModel[j].Tm != "TOT" && playerFlag) {
 
+                        firstYear = dataRangeYear.from;
+                        endYear = dataRangeYear.to;
+                        if (dataModel[j].Tm != saveTeam && saveTeam != "") {
+                            var yearColor = "";
 
+                            var color1 = getRGBArray(dataRangeYear.color_from);
+                            var color2 = getRGBArray(dataRangeYear.color_to);
 
-                    if (dataModel[j].Tm != saveTeam && saveTeam != "") {
-                        var yearColor = "";
-                        if (colorYear) {
                             var yearRange = (endYear - firstYear);
                             var yearPos = parseInt(dataModel[j].Year) - firstYear;
-                            var redColor = Math.round(255 - 255 * (yearPos / yearRange));
-                            var blueColor = Math.round(255 * (yearPos / yearRange));
-                            var yearColor = "rgba(" + blueColor + ",0," + redColor + ",0.1)";
+                            var percent = (yearPos / yearRange);
+
+                            var redColor;
+                            var greenColor = 0;
+                            var blueColor = 0;
+
+                            if (color1[0] > color2[0]) {
+                                redColor = color1[0] - percent * (color1[0] - color2[0]);
+                            } else {
+                                redColor = color1[0] + percent * (color2[0] - color1[0]);
+                            }
+
+                            if (color1[1] > color2[1]) {
+                                greenColor = color1[1] - percent * (color1[1] - color2[1]);
+                            } else {
+                                greenColor = color1[1] + percent * (color2[1] - color1[1]);
+                            }
+
+                            if (color1[2] > color2[2]) {
+                                blueColor = color1[2] - percent * (color1[2] - color2[2]);
+                            } else {
+                                blueColor = color1[2] + percent * (color2[2] - color1[2]);
+                            }
+
+                            yearColor = "rgba(" + Math.round(redColor) + "," + Math.round(greenColor) + "," + Math.round(blueColor) + ",0.5)";
+
+
+                            if (colorPlayer) {
+                                yearColor = dataModelNameDic[dataModel[j].Player].color;
+                            }
+
+                            var jsonStruc = {
+                                "from": "X",
+                                "to": "X",
+                                "playerName": "",
+                                "value": 1,
+                                "color": yearColor,
+                                "connectionNum": 0
+                            }
+                            connectionnum++;
+                            jsonStruc.from = saveTeam;
+                            jsonStruc.to = dataModel[j].Tm;
+                            jsonStruc.playerName = dataModelNames[i].Name;
+                            jsonStruc.connectionNum = connectionnum;
+                            dataArray.push(jsonStruc);
+
+                            saveTeam = dataModel[j].Tm;
                         } else {
-                            yearColor = "#000"
+                            saveTeam = dataModel[j].Tm;
                         }
-                        if (colorPlayer) {
-                            yearColor = dataModelNameDic[dataModel[j].Player].color;
-                        }
-
-                        var jsonStruc = {
-                            "from": "X",
-                            "to": "X",
-                            "playerName": "",
-                            "value": 1,
-                            "color": yearColor,
-                            "connectionNum": 0
-                        }
-                        connectionnum++;
-                        jsonStruc.from = saveTeam;
-                        jsonStruc.to = dataModel[j].Tm;
-                        jsonStruc.playerName = dataModelNames[i].Name;
-                        jsonStruc.connectionNum = connectionnum;
-                        dataArray.push(jsonStruc);
-
-                        saveTeam = dataModel[j].Tm;
-                    } else {
-                        saveTeam = dataModel[j].Tm;
                     }
                 }
             }
+            saveTeam = "";
         }
-        saveTeam = "";
     }
 
     //ADD TEAM COLORS
-    if (!colorYear && !colorPlayer) {
+    if (!colorPlayer) {
         for (var i = 0; i < teamColor.length; i++) {
             dataArray.unshift(teamColor[i]);
         }
@@ -234,7 +268,13 @@ function changeData() {
 
 selectPlayerNames();
 
+function getRGBArray(rgb) {
+    var rgb = rgb.substring(4, rgb.length - 1)
+        .replace(/ /g, '')
+        .split(',');
 
+    return rgb;
+}
 
 
 function selectPlayerNames() {
