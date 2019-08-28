@@ -6,61 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="IO-UI/IO-UI-style.css">
 </head>
 
 <body>
-    <div class="IO-UI-input-bar-container">
-        <div id="IO-UI-input-info-text">
-            <p class="IO-UI-input-info-fade">Here goes the info!</p>
-        </div>
-        <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD RANGE</button>
-        <!--<button class="IO-UI-input-add-range-btn" id="IO-UI-add-range">ADD RANGE</button>-->
-        <div class="IO-UI-input-bar"></div>
-        <div class="IO-UI-token-container">
-            <div class="IO-UI-range">
-                <div class="IO-UI-token" data-year="1960">
-                    <p class="IO-UI-token-text">100</p>
-                </div>
-                <div class="IO-UI-token" data-year="2008">
-                    <p class="IO-UI-token-text">100</p>
+    <div class="IO-UI-main-container">
+        <div class="IO-UI-input-bar-container">
+            <div id="IO-UI-input-info-text">
+                <p class="IO-UI-input-info-fade">Here goes the info!</p>
+            </div>
+            <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
+            <!--<button class="IO-UI-input-add-range-btn" id="IO-UI-add-range">ADD RANGE</button>-->
+            <div class="IO-UI-input-bar"></div>
+            <div class="IO-UI-token-container">
+                <div class="IO-UI-range">
+                    <div class="IO-UI-token" data-year="1974">
+                        <p class="IO-UI-token-text">100</p>
+                    </div>
+                    <div class="IO-UI-token" style="background-color: blue" data-year="1995">
+                        <p class="IO-UI-token-text">100</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
-
-
     <div class="filter-container">
-        <p>YEAR</p>
-        <input id="firstYear" class="nba-filter" type="number" placeholder="Firt Year" min="1950" max="2017" value="2007">
-        <input id="endYear" class="nba-filter" type="number" placeholder="End Year" min="1950" max="2017" value="2008">
-        <br> Color Year
-        <input id="colorYear" class="nba-filter" type="checkbox" value="1">
         <br> Color Player
         <input id="colorPlayer" class="nba-filter" type="checkbox" value="1">
+        <br> Name Player
+        <input id="namePlayer" class="nba-filter" type="checkbox" value="1">
+        <br> Up & Down
+        <input id="upDown" class="nba-filter" type="checkbox" value="1">
+        <br> Only Connection Teams
+        <input id="connectionTeams" class="nba-filter" type="checkbox" value="1">
         <p>AGE</p>
-        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="17" max="40" value="24">
-        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="17" max="40" value="24">
-        <p>PLAYER</p>
-        <select id="playerSelector" class="nba-filter">
-            <option value="NA">NA</option>
-        </select>
+        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="17" max="50" value="17">
+        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="17" max="50" value="50">
         <br>
+        <p>Opacity</p>
+        <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50">
         <br>
-        <button onclick="changeData()">Change Data</button>
+        <p>Arrage Teams By</p>
+        <input class="nba-filter" type="radio" name="arrage" value="age" checked> Old-Young<br>
+        <input class="nba-filter" type="radio" id="connectionArrange" name="arrage" value="connection"> Connections<br>
     </div>
-    <div id="chartdiv"></div>
-    <script src="jquery-3.4.1.min.js"></script>
-    <script src="amcharts4/core.js"></script>
-    <script src="amcharts4/charts.js"></script>
-    <script src="amcharts4/themes/animated.js"></script>
-    <script src="data.js"></script>
-    <script src="vis.js"></script>
+    <canvas id="myCanvas" />
+    <!--<button onclick="changeData()">Change Data</button>-->
 
     <script src="jquery-3.4.1.min.js"></script>
+    <script src="data.js"></script>
+
+
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="color-picker-master/iro.min.js"></script>
-    <script src="IO-UI.js"></script>
+    <script src="IO-UI/color-picker-master/iro.min.js"></script>
+    <script src="IO-UI/IO-UI.js"></script>
+    <script src="vis.js"></script>
 </body>
 
 </html>
