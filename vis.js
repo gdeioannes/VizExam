@@ -16,6 +16,10 @@ var speedAnimate = 100;
 var numberConnections = 0;
 var yearData = document.getElementById('yearData');
 
+//Charge the data for UI
+changeData();
+
+//Object Structure for nodes
 function Node() {
     this.name = "NA";
     this.x = -1;
@@ -26,8 +30,8 @@ function Node() {
     this.width = 0;
 }
 
-changeData();
 
+//Function that retrieves the data and create and fills the dataArray with the data for the specific query
 function changeData() {
     console.log("Change Data Begins");
     dataArray = [];
