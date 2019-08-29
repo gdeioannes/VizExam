@@ -198,12 +198,10 @@
         }
 
         function getDataRanges() {
-            console.log("Data Ranges Caluclated");
             var rangeArrayHTML = uiTokenContainer.find(".IO-UI-range");
             var rangeArray = [];
 
             for (var i = 0; i < rangeArrayHTML.length; i++) {
-                console.log(i);
                 var rangeObj = {
                     from: "",
                     color_from: "",
@@ -235,6 +233,6 @@
                 rangeArray.push(rangeObj);
 
             }
-            console.log(rangeArray);
+            //console.log(rangeArray);
             return rangeArray;
         }

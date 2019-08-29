@@ -175877,3 +175877,6 @@ var dataModel = [
         "Tm": "LAL"
   }
 ]
+
+dataModel.sort((a, b) => (a.Player < b.Player) ? 1 : -1);
+dataModelNames.sort((a, b) => (a.Name < b.Name) ? 1 : -1);

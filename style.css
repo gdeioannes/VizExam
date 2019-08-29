@@ -38,3 +38,6 @@ canvas {
 .filter-container {
     position: absolute;
 }
+
+dataModel.sort((a, b)=> (a.Player < b.Player) ? 1: -1);
+dataModelNames.sort((a, b)=> (a.Name < b.Name) ? 1: -1);
