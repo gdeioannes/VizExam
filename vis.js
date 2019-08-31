@@ -9,6 +9,7 @@ var animateTeams = false;
 var namePlayer = false;
 var connectionTeams = false;
 var fillConnection = false;
+var colorPlayer = false;
 //Drawing and Animation Vars
 var speedAnimate = 100;
 var milisecondsSpeed = 50;
@@ -21,7 +22,7 @@ var yearData = document.getElementById('yearData');
 //Debug vars
 var counterTotalConnections = 0;
 var connectionNum = document.getElementById('connectionNum')
-var offsetX = 130;
+var offsetX = 150;
 var posNodesY = window.innerHeight * 0.875;
 //Charge the data for UI
 changeData();
@@ -34,17 +35,38 @@ function changeData() {
     var dataRangesYear = getDataRanges();
     var firstAge = parseInt(document.getElementById('firstAge').value);
     var endAge = parseInt(document.getElementById('endAge').value);
-    var colorPlayer = document.getElementById('colorPlayer').checked;
     var opacityLine = parseInt(document.getElementById('opacityLine').value);
     numberConnections = parseInt(document.getElementById('numberConnections').value);
     speedAnimate = parseInt(document.getElementById('speedAnimate').value);
-    connectionTeams = document.getElementById('connectionTeams').checked;
-    animateTeams = document.getElementById('animateTeams').checked;
-    namePlayer = document.getElementById('namePlayer').checked;
-    fillConnection
-    fillConnection = document.getElementById('fillConnection').checked;
-
     countDrawIncrease = numberConnections;
+
+    var valuesMultiSelect = $('#multiselect1').val();
+
+    if (valuesMultiSelect != null) {
+        fillConnection = false;
+        namePlayer = false;
+        colorPlayer = false;
+        animateTeams = false;
+        connectionTeams = false;
+        for (var i = 0; i < valuesMultiSelect.length; i++) {
+            var value = valuesMultiSelect[i];
+            if (value == "connectionTeams") {
+                connectionTeams = true;
+            }
+            if (value == "fillConnection") {
+                fillConnection = true;
+            }
+            if (value == "namePlayer") {
+                namePlayer = true;
+            }
+            if (value == "colorPlayer") {
+                colorPlayer = true;
+            }
+            if (value == "animateTeams") {
+                animateTeams = true;
+            }
+        }
+    }
 
     //Get Years Range Selection
     for (var ii = 0; ii < dataRangesYear.length; ii++) {
@@ -171,8 +193,6 @@ function createNodes() {
         team.y = posNodesY;
         team.radius = radius;
 
-
-
         if (minTrade > team.trade_num) {
             minTrade = team.trade_num;
         }
@@ -293,6 +313,7 @@ function drawAnimate() {
             //Draw Border Line For comparizon
         }
         if (namePlayer) {
+            ctx.fillStyle = "#000000";
             ctx.fillText(dataArray[i].playerName + " " + (linewith + 1), mid, saveFrom.y - (max - min) / 2 - 4);
         }
 
@@ -365,14 +386,14 @@ function getGradientColor(color1, color2, endYear, firstYear, currentYear, opaci
     }
 
     if (fillConnection) {
-        var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (0.01 + (1 / counterTotalConnections * 3)) + ")";
+        var treshOpacity = ((0.01 + (1 / counterTotalConnections)) / (100 / opacityLine));
+        if (treshOpacity == Infinity) {
+            treshOpacity = 0.001;
+        }
+        var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + treshOpacity + ")";
     } else {
         var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (opacityLine / 100) + ")";
     }
-
-
-    console.log("Total Connections:" + counterTotalConnections);
-    console.log("RGBA:" + rgbaColor);
     return rgbaColor;
 }
 
@@ -390,7 +411,7 @@ $(".nba-filter").change(function () {
 
 
 function sortNodes() {
-    var key = document.getElementById('sortSelector').value;
+    var key = $('#sortSelector').val();
     switch (key) {
         case "old_new":
             teamsArray = teamsArray.sort((a, b) => (a.order > b.order) ? 1 : -1);

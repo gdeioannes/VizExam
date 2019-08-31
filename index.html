@@ -7,61 +7,98 @@
     <title></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="IO-UI/IO-UI-style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-select-1.13.9/css/bootstrap-select.css">
 </head>
 
 <body>
-    <div class="title-container">
-        <h1 class="page-title">NBA TRADES 50s to 17s : <span class="page-title" id="connectionNum">n</span></h1>
-    </div>
-    <div class="filter-container">
-        Color Player
-        <input id="colorPlayer" class="nba-filter" type="checkbox" value="1"> Name Player
-        <input id="namePlayer" class="nba-filter" type="checkbox" value="1"> Teams whith trades
-        <input id="connectionTeams" class="nba-filter" type="checkbox" value="1"> Fill Connections
-        <input id="fillConnection" class="nba-filter" type="checkbox" value="1"> Animate
-        <input id="animateTeams" class="nba-filter" type="checkbox" value="1"> Speed
-        <input id="speedAnimate" class="nba-filter" type="number" min="0" max="100" value="100"> N Draw Connections
-        <input id="numberConnections" class="nba-filter" type="number" min="0" max="400000" value="500"> AGE <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18">
-        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44"> Opacity <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50"> Arrage Teams By <select id="sortSelector" class="nba-filter">
-            <option value="old_new" selected>Old -> New</option>
-            <option value="trade_num">Connections</option>
-            <option value="min_temp">Min Temperature</option>
-            <option value="max_temp">Max Temperature</option>
-            <option value="avg_temp">Avg Temperature</option>
-            <option value="champ_wins">Champs Wins</option>
-        </select>
-
-    </div>
-    <div class="IO-UI-main-container">
-        <div class="IO-UI-input-bar-container">
-            <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
-            <div id="IO-UI-input-info-text">
-                <p class="IO-UI-input-info-fade">Here goes the info!</p>
-            </div>
-            <!--<button class="IO-UI-input-add-range-btn" id="IO-UI-add-range">ADD RANGE</button>-->
-            <div class="IO-UI-input-bar"></div>
-            <div class="IO-UI-token-container">
-                <div class="IO-UI-range">
-                    <div class="IO-UI-token" data-year="1950">
-                        <p class="IO-UI-token-text">100</p>
+    <div class="container text-center">
+        <div class="col-sm-12">
+            <h1 class="page-title">NBA TRADES from 1950s to 2017s : <span class="page-title" id="connectionNum">n</span></h1>
+        </div>
+        <div class="col-sm-12 range-container">
+            <div class="col-sm-1"></div>
+            <div class="IO-UI-input-bar-container">
+                <div class="col-sm-3">
+                    <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
+                </div>
+                <div class="col-sm-6">
+                    <div class="IO-UI-input-bar"></div>
+                    <div class="IO-UI-token-container">
+                        <div class="IO-UI-range">
+                            <div class="IO-UI-token" data-year="1950">
+                                <p class="IO-UI-token-text">100</p>
+                            </div>
+                            <div class="IO-UI-token" style="background-color: blue" data-year="2017">
+                                <p class="IO-UI-token-text">100</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="IO-UI-token" style="background-color: blue" data-year="2017">
-                        <p class="IO-UI-token-text">100</p>
+                    <div id="IO-UI-input-info-text">
+                        <p class="IO-UI-input-info-fade">Here goes the info!</p>
                     </div>
                 </div>
+                <div class="col-sm-2"></div>
+
             </div>
+            <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
         </div>
+        <div class="col-sm-1"></div>
+        <div class="col-sm-2">
+            <label>Draw:</label>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <select class="selectpicker form-control nba-filter" id="multiselect1" title="Select Drawin" multiple>
+                    <option value="connectionTeams">Team With Trades</option>
+                    <option value="fillConnection">Fill Connections</option>
+                    <option value="animateTeams">Animate</option>
+                    <option value="namePlayer">Name Player</option>
+                    <option value="colorPlayer">Color Player</option>connectionTeams
+                </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-2">
+            <label>Arrange by:</label>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <select class="selectpicker form-control nba-filter" id="sortSelector" title="Select Order">
+                    <option value="old_new" selected>Old -> New</option>
+                    <option value="trade_num">Connections</option>
+                    <option value="min_temp">Min Temperature</option>
+                    <option value="max_temp">Max Temperature</option>
+                    <option value="avg_temp">Avg Temperature</option>
+                    <option value="champ_wins">Champs Wins</option>
+                </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-3">
+            <label>Options:</label>
+            <br> AGE: <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18"><input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44"> Opacity
+            <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50">
+        </div>
+
+        <div class="col-sm-3">
+            <label>Animation Options:</label>
+            <br>N Connections
+            <input id="numberConnections" class="nba-filter" type="number" min="0" max="400000" value="500"> Speed
+            <input id="speedAnimate" class="nba-filter" type="number" min="0" max="100" value="100">
+        </div>
+
+        <div class="col-sm-1"></div>
     </div>
-    <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
+
 
     <canvas id="myCanvas" />
     <!--<button onclick="changeData()">Change Data</button>-->
-
-    <script src="jquery-3.4.1.min.js"></script>
-    <script src="data.js"></script>
-
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="bootstrap-select-1.13.9/js/bootstrap-select.js"></script>
+    <script src="data.js"></script>
     <script src="IO-UI/color-picker-master/iro.min.js"></script>
     <script src="IO-UI/IO-UI.js"></script>
     <script src="vis.js"></script>

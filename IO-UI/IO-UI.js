@@ -32,10 +32,9 @@
         colorPicker.hide();
 
         var leftStart = uiTokenContainer.offset().left;
-        var topStart = uiTokenContainer.offset().top - uiTokenBar.height() / 2;
 
         var leftEnd = uiTokenContainer.offset().left + uiTokenBar.width() / 2 - uiToken.width();
-        var topEnd = uiTokenContainer.offset().top - uiTokenBar.height() / 2;
+        var topEnd = uiTokenBar.offset().top - uiTokenBar.height() / 2;
         uiToken.css("left", leftEnd);
         uiToken.css("top", topEnd);
 
