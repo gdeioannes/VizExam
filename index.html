@@ -10,13 +10,34 @@
 </head>
 
 <body>
-    <h1 class="page-title">NBA TRADES from 1950 to 2017</h1>
+    <div class="title-container">
+        <h1 class="page-title">NBA TRADES 50s to 17s : <span class="page-title" id="connectionNum">n</span></h1>
+    </div>
+    <div class="filter-container">
+        Color Player
+        <input id="colorPlayer" class="nba-filter" type="checkbox" value="1"> Name Player
+        <input id="namePlayer" class="nba-filter" type="checkbox" value="1"> Teams whith trades
+        <input id="connectionTeams" class="nba-filter" type="checkbox" value="1"> Fill Connections
+        <input id="fillConnection" class="nba-filter" type="checkbox" value="1"> Animate
+        <input id="animateTeams" class="nba-filter" type="checkbox" value="1"> Speed
+        <input id="speedAnimate" class="nba-filter" type="number" min="0" max="100" value="100"> N Draw Connections
+        <input id="numberConnections" class="nba-filter" type="number" min="0" max="400000" value="500"> AGE <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18">
+        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44"> Opacity <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50"> Arrage Teams By <select id="sortSelector" class="nba-filter">
+            <option value="old_new" selected>Old -> New</option>
+            <option value="trade_num">Connections</option>
+            <option value="min_temp">Min Temperature</option>
+            <option value="max_temp">Max Temperature</option>
+            <option value="avg_temp">Avg Temperature</option>
+            <option value="champ_wins">Champs Wins</option>
+        </select>
+
+    </div>
     <div class="IO-UI-main-container">
         <div class="IO-UI-input-bar-container">
+            <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
             <div id="IO-UI-input-info-text">
                 <p class="IO-UI-input-info-fade">Here goes the info!</p>
             </div>
-            <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
             <!--<button class="IO-UI-input-add-range-btn" id="IO-UI-add-range">ADD RANGE</button>-->
             <div class="IO-UI-input-bar"></div>
             <div class="IO-UI-token-container">
@@ -32,33 +53,7 @@
         </div>
     </div>
     <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
-    <div class="filter-container">
-        <br> Color Player
-        <input id="colorPlayer" class="nba-filter" type="checkbox" value="1">
-        <br> Name Player
-        <input id="namePlayer" class="nba-filter" type="checkbox" value="1">
-        <br> Up & Down
-        <input id="upDown" class="nba-filter" type="checkbox" value="1">
-        <br>Teams whith trades
-        <input id="connectionTeams" class="nba-filter" type="checkbox" value="1">
-        <br> Animate
-        <input id="animateTeams" class="nba-filter" type="checkbox" value="1">
-        <div id="yearData">Year 1974</div>
-        <br>Speed
-        <input id="speedAnimate" class="nba-filter" type="number" min="0" max="100" value="100">
-        <br>N Draw Connections
-        <input id="numberConnections" class="nba-filter" type="number" min="0" max="400000" value="500">
-        <p>AGE</p>
-        <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18">
-        <input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44">
-        <br>
-        <p>Opacity</p>
-        <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50">
-        <br>
-        <p>Arrage Teams By</p>
-        <input class="nba-filter" type="radio" name="arrage" value="age" checked> Old-Young<br>
-        <input class="nba-filter" type="radio" id="connectionArrange" name="arrage" value="connection"> Connections<br>
-    </div>
+
     <canvas id="myCanvas" />
     <!--<button onclick="changeData()">Change Data</button>-->
 

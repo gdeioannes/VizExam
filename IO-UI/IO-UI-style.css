@@ -5,11 +5,12 @@ submit {
 }
 
 .IO-UI-main-container {
+    z-index: 100;
     position: relative;
     margin: auto;
     width: 50%;
-    margin-bottom: 10px;
 
+    color:
 }
 
 .IO-UI-input-bar-container {
@@ -46,7 +47,6 @@ submit {
 .IO-UI-input-add-range-btn,
 .IO-UI-delete-btn {
     border-radius: 25px;
-    margin-bottom: 20px;
     background-color: #CCCCCC;
     padding: 10px;
     padding-left: 20px;

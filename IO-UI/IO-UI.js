@@ -154,12 +154,17 @@
             $(pick).parent().remove();
         });
 
-        $(window).click(function () {
+        $("#color-picker-container").click(function () {
             colorPicker.hide();
             changeData();
         });
 
+        $(window).click(function () {
+            colorPicker.hide();
+        });
+
         $(window).resize(function () {
+            changeData();
             var tokens = $(".IO-UI-token");
             for (var i = 0; i < tokens.length; i++) {
                 var mToke = tokens[i];

@@ -1,38 +1,34 @@
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 
+//Data Vars
 var dataArray = [];
+var teamsArray = [];
+//UI Vars
+var animateTeams = false;
 var namePlayer = false;
-var upDown = false;
 var connectionTeams = false;
-var nodeArray = [];
+var fillConnection = false;
+//Drawing and Animation Vars
+var speedAnimate = 100;
 var milisecondsSpeed = 50;
 var animate = setInterval(drawAnimate, milisecondsSpeed);
 var countDrawIncrease = 500;
 var countDrawInterval = countDrawIncrease;
-var finishFlag = false;
-var animateTeams = false;
-var speedAnimate = 100;
 var numberConnections = 0;
+var finishFlag = false;
 var yearData = document.getElementById('yearData');
-
+//Debug vars
+var counterTotalConnections = 0;
+var connectionNum = document.getElementById('connectionNum')
+var offsetX = 130;
+var posNodesY = window.innerHeight * 0.875;
 //Charge the data for UI
 changeData();
 
-//Object Structure for nodes
-function Node() {
-    this.name = "NA";
-    this.x = -1;
-    this.y = -1;
-    this.color = "";
-    this.radius = 0;
-    this.tradenum = 0;
-    this.width = 0;
-}
-
-
 //Function that retrieves the data and create and fills the dataArray with the data for the specific query
 function changeData() {
+    counterTotalConnections = 0;
     console.log("Change Data Begins");
     dataArray = [];
     var dataRangesYear = getDataRanges();
@@ -43,10 +39,10 @@ function changeData() {
     numberConnections = parseInt(document.getElementById('numberConnections').value);
     speedAnimate = parseInt(document.getElementById('speedAnimate').value);
     connectionTeams = document.getElementById('connectionTeams').checked;
-    upDown = document.getElementById('upDown').checked;
-    animateTeams
     animateTeams = document.getElementById('animateTeams').checked;
     namePlayer = document.getElementById('namePlayer').checked;
+    fillConnection
+    fillConnection = document.getElementById('fillConnection').checked;
 
     countDrawIncrease = numberConnections;
 
@@ -76,7 +72,6 @@ function changeData() {
 
                 if (!(dataModelNames[i].Name == dataModel[j].Player)) {
                     //Data Models are sorted By Names
-
                     break;
                 }
 
@@ -113,6 +108,7 @@ function changeData() {
                         "increaseSpeedDraw": (0.01 + (0.05 * Math.random()))
                     }
                     connectionnum++;
+                    counterTotalConnections++;
                     dataArray.push(jsonStruc);
 
                     saveTeam = dataModel[j].Tm;
@@ -124,7 +120,7 @@ function changeData() {
             saveTeam = "";
         }
     }
-
+    $(connectionNum).html(counterTotalConnections);
     //Set Variable from Drawing in case the amount pick is larger than the length
     if (countDrawIncrease > dataArray.length) {
         countDrawIncrease = dataArray.length;
@@ -135,7 +131,6 @@ function changeData() {
 }
 
 function createNode() {
-
     createNodes();
     dataArray = dataArray.sort((a, b) => (a.year > b.year) ? 1 : -1)
 
@@ -147,82 +142,105 @@ function createNode() {
 }
 
 function createNodes() {
-    nodeArray = [];
+    teamsArray = [];
+    console.log("Total Connections:" + counterTotalConnections);
     var maxTrade = 0;
     var minTrade = 1000000000;
     var radius = 5;
-    var space = 3;
-    var offsetX = 100;
+    //Arrange in canvas space
     var totalSpace = window.innerWidth - offsetX * 2;
+    var sumSpace = offsetX;
+    var nodeSpace = 10;
+    totalSpace = totalSpace - nodeSpace * teamsData.length;
 
-    for (var i = 0; i < teamColor.length; i++) {
-        var team = teamColor[i];
-        var myNode = new Node();
-        myNode.name = team.from;
-        //myNode.x = offsetX + (radius + space) * i * 2;
-        myNode.y = 575;
-        myNode.color = team.color;
-        myNode.radius = radius;
+    for (var i = 0; i < teamsData.length; i++) {
+        var team = teamsData[i];
+        team.trade_num = 0;
+    }
 
+    for (var i = 0; i < teamsData.length; i++) {
+        var team = teamsData[i];
+
+        //Count Trades in the team
         for (var j = 0; j < dataArray.length; j++) {
-            if (myNode.name == dataArray[j].from || myNode.name == dataArray[j].to) {
-                myNode.tradenum++;
+            if (team.id == dataArray[j].from || team.id == dataArray[j].to) {
+                team.trade_num = team.trade_num + 1;
             }
         }
 
-        if (minTrade > myNode.tradenum) {
-            minTrade = myNode.tradenum;
+        team.y = posNodesY;
+        team.radius = radius;
+
+
+
+        if (minTrade > team.trade_num) {
+            minTrade = team.trade_num;
         }
 
-        if (maxTrade < myNode.tradenum) {
-            maxTrade = myNode.tradenum;
+        if (maxTrade < team.trade_num) {
+            maxTrade = team.trade_num;
         }
 
-        myNode.width = totalSpace * (maxTrade / dataArray.length);
+        team.radius = (team.radius + 20) * ((team.trade_num - minTrade) / maxTrade);
 
-        myNode.radius = (myNode.radius + 20) * ((myNode.tradenum - minTrade) / maxTrade);
-        if (connectionTeams) {
-            if (myNode.tradenum > 0) {
-                nodeArray.push(myNode);
+        if (connectionTeams && team.trade_num <= 0) {
+            continue;
+        }
+        team.order = i;
+    }
+
+    if (connectionTeams) {
+        for (var i = 0; i < teamsData.length; i++) {
+            var team = teamsData[i];
+            if (team.trade_num > 0) {
+                teamsArray.push(team);
             }
-        } else {
-            nodeArray.push(myNode);
+        }
+    } else {
+        for (var i = 0; i < teamsData.length; i++) {
+            var team = teamsData[i];
+            teamsArray.push(team);
         }
     }
 
-    for (var i = 0; i < nodeArray.length; i++) {
-        nodeArray[i].x = offsetX + i * (totalSpace / nodeArray.length);
+    sortNodes();
+    totalSpace = window.innerWidth - offsetX * 2;
+    sumSpace = offsetX;
+    nodeSpace = 10;
+    totalSpace = totalSpace - nodeSpace * teamsArray.length;
+    for (var i = 0; i < teamsArray.length; i++) {
+        var team = teamsArray[i];
+        team.width = nodeSpace + (totalSpace * ((team.trade_num / 2) / counterTotalConnections));
+        var diff = team.width / 2;
+        team.x = sumSpace;
+        sumSpace += team.width;
     }
 
-    if (document.getElementById("connectionArrange").checked) {
-        //Arrange Trade num Order
-        nodeArray = nodeArray.sort((a, b) => (a.tradenum < b.tradenum) ? 1 : -1);
 
-        for (var i = 0; i < nodeArray.length; i++) {
-            nodeArray[i].x = offsetX + i * (totalSpace / nodeArray.length);
-        }
-    }
+
 }
 
 function drawAnimate() {
+    console.log("Drawing");
     c.width = c.width;
     finishFlag = true;
+
     //Draw connections
     for (var i = 0; i < countDrawInterval; i++) {
         var countFT = 0;
-        var saveFromX = 0;
-        var saveToX = 0;
+        var saveFrom = 0;
+        var saveTo = 0;
         var nodeColor = "";
-        var linewith = "";
-        for (var j = 0; j < nodeArray.length; j++) {
-
-            if (dataArray[i].from == nodeArray[j].name) {
-                saveFromX = nodeArray[j].x;
+        var linewith = 0;
+        for (var j = 0; j < teamsArray.length; j++) {
+            var team = teamsArray[j];
+            if (dataArray[i].from == team.id) {
+                saveFrom = team;
                 countFT++;
             }
 
-            if (dataArray[i].to == nodeArray[j].name) {
-                saveToX = nodeArray[j].x;
+            if (dataArray[i].to == team.id) {
+                saveTo = team;
                 countFT++;
             }
 
@@ -232,26 +250,19 @@ function drawAnimate() {
                 break;
             }
         }
-
+        ctx.save();
         ctx.beginPath();
-        var max = Math.max(saveFromX, saveToX);
-        var min = Math.min(saveFromX, saveToX);
-        var mid = Math.min(saveFromX, saveToX) + (Math.max(saveFromX, saveToX) - Math.min(saveFromX, saveToX)) / 2;
+        var max = Math.max(saveFrom.x + saveFrom.width / 2, saveTo.x + saveTo.width / 2);
+        var min = Math.min(saveFrom.x + saveFrom.width / 2, saveTo.x + saveTo.width / 2);
+        var mid = min + (max - min) / 2;
+        //Team Ratio Connection offset
+        var teamRCOffset = 0;
         if (animateTeams) {
-            if (upDown) {
-                if (linewith % 2) {
-                    ctx.arc(mid, 575, (max - min) / 2, 0, Math.PI * 1, true);
-                } else {
-                    ctx.arc(mid, 575, (max - min) / 2, Math.PI * 1, Math.PI * 2, true);
-                }
-            }
-            if (saveFromX > saveToX) {
-                ctx.arc(mid, 575, (max - min) / 2, Math.PI * (1 + dataArray[i].radDraw), Math.PI, true);
+            if (saveFrom.x > saveTo.x) {
+                ctx.arc(mid - teamRCOffset, saveFrom.y, (max - min) / 2, Math.PI * (1 + dataArray[i].radDraw), Math.PI, true);
             } else {
-                ctx.arc(mid, 575, (max - min) / 2, -dataArray[i].radDraw * Math.PI, 0, 0);
+                ctx.arc(mid - teamRCOffset, saveFrom.y, (max - min) / 2, -dataArray[i].radDraw * Math.PI, 0, 0);
             }
-
-
 
             if (dataArray[i].radDraw < 1) {
                 dataArray[i].radDraw += dataArray[i].increaseSpeedDraw / (100 / speedAnimate);
@@ -265,36 +276,68 @@ function drawAnimate() {
                 }
             }
         } else {
-            countDrawInterval = dataArray.length - 1;
-            ctx.arc(mid, 575, (max - min) / 2, 0, Math.PI * 1, true);
+            countDrawInterval = dataArray.length;
+            ctx.arc(mid - teamRCOffset, saveTo.y, (max - min) / 2, 0, Math.PI * 1, true);
+            dataArray[i].finishDraw = true;
+            finishFlag = true;
         }
 
         ctx.lineWidth = linewith * 0.5;
         ctx.strokeStyle = nodeColor;
         ctx.textAlign = "center";
         ctx.stroke();
-        ctx.fillStyle = "#000";
+        ctx.closePath();
+        if (fillConnection) {
+            ctx.fillStyle = nodeColor;
+            ctx.fill();
+            //Draw Border Line For comparizon
+        }
         if (namePlayer) {
-            ctx.fillText(dataArray[i].playerName + " " + (linewith + 1), mid, 625 - (max - min) / 2);
+            ctx.fillText(dataArray[i].playerName + " " + (linewith + 1), mid, saveFrom.y - (max - min) / 2 - 4);
         }
 
         if (!dataArray[i].finishDraw) {
             finishFlag = false;
         }
+        ctx.restore();
     }
 
+    //DrawLine
+
+
     //Draw Node
-    for (var i = 0; i < nodeArray.length; i++) {
-        var node = nodeArray[i];
-        ctx.beginPath();
-        ctx.fillStyle = node.color;
+    for (var i = 0; i < teamsArray.length; i++) {
         ctx.save();
-        ctx.translate(node.x - 5, node.y + 45);
+        var team = teamsArray[i];
+        ctx.beginPath();
+        ctx.fillStyle = "#" + team.color_1;
+        ctx.rect(team.x, team.y, team.width, 20);
+        //ctx.arc(node.x + node.width / 2, node.y, node.width / 2, 0, Math.PI * 2, 0);
+        ctx.save();
+        //ctx.translate(node.x - 5 + node.width / 2, node.y + node.width / 2 + 20);
+        ctx.translate(team.x - 5 + team.width / 2, team.y + 30);
         ctx.rotate(Math.PI * 0.5);
-        ctx.fillText(node.name, 0, 0);
+        ctx.textAlign = "left"
+        ctx.fillText(team.id, 0, 0);
         ctx.restore();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2, true);
         ctx.fill();
+        ctx.closePath();
+        ctx.restore();
+    }
+
+    //Draw reference line for fill once
+    if (fillConnection) {
+        ctx.save();
+        var radiusMark = (teamsArray[teamsArray.length - 1].x - teamsArray[0].x) / 2;
+        var posX = teamsArray[0].x + radiusMark + (teamsArray[0].width / 2) + (teamsArray[teamsArray.length - 1].width / 2) - (teamsArray[0].width / 2);
+        var posY = teamsArray[0].y;
+        ctx.beginPath();
+        ctx.strokeStyle = "#CCC";
+        ctx.strokeWidth = 0.1;
+        ctx.arc(posX, posY, radiusMark, 0, 1 * Math.PI, true);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.restore();
     }
 
     if (finishFlag) {
@@ -321,7 +364,16 @@ function getGradientColor(color1, color2, endYear, firstYear, currentYear, opaci
         }
     }
 
-    return "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (opacityLine / 100) + ")";
+    if (fillConnection) {
+        var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (0.01 + (1 / counterTotalConnections * 3)) + ")";
+    } else {
+        var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (opacityLine / 100) + ")";
+    }
+
+
+    console.log("Total Connections:" + counterTotalConnections);
+    console.log("RGBA:" + rgbaColor);
+    return rgbaColor;
 }
 
 function getRGBArray(rgb) {
@@ -335,3 +387,38 @@ function getRGBArray(rgb) {
 $(".nba-filter").change(function () {
     changeData();
 });
+
+
+function sortNodes() {
+    var key = document.getElementById('sortSelector').value;
+    switch (key) {
+        case "old_new":
+            teamsArray = teamsArray.sort((a, b) => (a.order > b.order) ? 1 : -1);
+            break;
+
+        case "trade_num":
+            console.log(key);
+            teamsArray = teamsArray.sort((a, b) => (a.trade_num > b.trade_num) ? 1 : -1);
+            break;
+
+        case "min_temp":
+            console.log(key);
+            teamsArray = teamsArray.sort((a, b) => (a.min_temp > b.min_temp) ? 1 : -1);
+            break;
+
+        case "max_temp":
+            console.log(key);
+            teamsArray = teamsArray.sort((a, b) => (a.max_temp > b.max_temp) ? 1 : -1);
+            break;
+
+        case "avg_temp":
+            console.log(key);
+            teamsArray = teamsArray.sort((a, b) => (a.avg_temp > b.avg_temp) ? 1 : -1);
+            break;
+
+        case "champ_wins":
+            console.log(key);
+            teamsArray = teamsArray.sort((a, b) => (a.champ_wins > b.champ_wins) ? 1 : -1);
+            break;
+    }
+}
