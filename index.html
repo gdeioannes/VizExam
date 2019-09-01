@@ -16,53 +16,31 @@
         <div class="col-sm-12">
             <h1 class="page-title">NBA TRADES from 1950s to 2017s : <span class="page-title" id="connectionNum">n</span></h1>
         </div>
-        <div class="col-sm-12 range-container">
-            <div class="col-sm-1"></div>
-            <div class="IO-UI-input-bar-container">
-                <div class="col-sm-3">
-                    <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
-                </div>
-                <div class="col-sm-6">
-                    <div class="IO-UI-input-bar"></div>
-                    <div class="IO-UI-token-container">
-                        <div class="IO-UI-range">
-                            <div class="IO-UI-token" data-year="1950">
-                                <p class="IO-UI-token-text">100</p>
-                            </div>
-                            <div class="IO-UI-token" style="background-color: blue" data-year="2017">
-                                <p class="IO-UI-token-text">100</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="IO-UI-input-info-text">
-                        <p class="IO-UI-input-info-fade">Here goes the info!</p>
-                    </div>
-                </div>
-                <div class="col-sm-2"></div>
-
-            </div>
-            <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
-        </div>
+    </div>
+    <div class="container menu-container text-center">
         <div class="col-sm-1"></div>
         <div class="col-sm-2">
-            <label>Draw:</label>
+            <label>Draw Filters:</label>
             <form class="form-horizontal" role="form">
                 <div class="form-group">
                     <select class="selectpicker form-control nba-filter" id="multiselect1" title="Select Drawin" multiple>
-                    <option value="connectionTeams">Team With Trades</option>
+                        
+                    <option value="connectionTeams">Only Teams with trades</option>
                     <option value="fillConnection">Fill Connections</option>
-                    <option value="animateTeams">Animate</option>
-                    <option value="namePlayer">Name Player</option>
-                    <option value="colorPlayer">Color Player</option>connectionTeams
+                    <option value="animateTeams">Animate Connections</option>
+                    <option value="onlyDrawSelected">Only selected player</option>
+                    <option value="namePlayer">Name Players</option>
+                    <option value="colorPlayer">Color Player</option>
+                    <option value="neverTraded">Never Traded</option>
+                        
                 </select>
                 </div>
             </form>
         </div>
-
         <div class="col-sm-2">
-            <label>Arrange by:</label>
+            <label>Arrange Teams by:</label>
             <form class="form-horizontal" role="form">
-                <div class="form-group">
+                <div class="">
                     <select class="selectpicker form-control nba-filter" id="sortSelector" title="Select Order">
                     <option value="old_new" selected>Old -> New</option>
                     <option value="trade_num">Connections</option>
@@ -78,7 +56,7 @@
         <div class="col-sm-3">
             <label>Options:</label>
             <br> AGE: <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18"><input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44"> Opacity
-            <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="0" max="100" value="50">
+            <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="1" max="100" step="5" value="50">
         </div>
 
         <div class="col-sm-3">
@@ -89,6 +67,39 @@
         </div>
 
         <div class="col-sm-1"></div>
+    </div>
+    <div class="container text-center">
+        <div class="col-sm-12 range-container">
+            <div class="col-sm-2">
+                <div class="form-group">
+                    <label>Players:</label>
+                    <select multiple class="selectpicker form-control" id="playerSelect" data-container="body" data-live-search="true" title="Select a number" data-hide-disabled="true" data-actions-box="true" data-virtual-scroll="false"></select>
+                </div>
+            </div>
+
+            <div class="IO-UI-input-bar-container">
+                <div class="col-sm-2">
+                    <button class="IO-UI-input-add-range-btn" id="IO-UI-add-token">ADD YEAR RANGE</button>
+                </div>
+                <div class="col-sm-7 bar-container">
+                    <div class="IO-UI-input-bar"></div>
+                    <div class="IO-UI-token-container">
+                        <div class="IO-UI-range">
+                            <div class="IO-UI-token" data-year="1950">
+                                <p class="IO-UI-token-text">100</p>
+                            </div>
+                            <div class="IO-UI-token" style="background-color: blue" data-year="2017">
+                                <p class="IO-UI-token-text">100</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="IO-UI-input-info-text">
+                        <p class="IO-UI-input-info-fade">Here goes the info!</p>
+                    </div>
+                </div>
+            </div>
+            <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
+        </div>
     </div>
 
 

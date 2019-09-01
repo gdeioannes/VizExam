@@ -81,7 +81,7 @@
                     },
                     stop: function (event, ui) {
                         getDataRanges();
-                        changeData();
+                        changeDataAndSelector();
                     }
                 });
 

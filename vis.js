@@ -4,12 +4,17 @@ var ctx = c.getContext("2d");
 //Data Vars
 var dataArray = [];
 var teamsArray = [];
+var playerInRange = [];
+var playerSelected = [];
 //UI Vars
 var animateTeams = false;
 var namePlayer = false;
 var connectionTeams = false;
 var fillConnection = false;
 var colorPlayer = false;
+var neverTraded = false;
+var addNameToSelection = false;
+var onlyDrawSelected = false;
 //Drawing and Animation Vars
 var speedAnimate = 100;
 var milisecondsSpeed = 50;
@@ -26,28 +31,25 @@ var offsetX = 150;
 var posNodesY = window.innerHeight * 0.875;
 //Charge the data for UI
 changeData();
+addOptionSelectors();
 
 //Function that retrieves the data and create and fills the dataArray with the data for the specific query
-function changeData() {
-    counterTotalConnections = 0;
-    console.log("Change Data Begins");
-    dataArray = [];
-    var dataRangesYear = getDataRanges();
-    var firstAge = parseInt(document.getElementById('firstAge').value);
-    var endAge = parseInt(document.getElementById('endAge').value);
-    var opacityLine = parseInt(document.getElementById('opacityLine').value);
-    numberConnections = parseInt(document.getElementById('numberConnections').value);
-    speedAnimate = parseInt(document.getElementById('speedAnimate').value);
-    countDrawIncrease = numberConnections;
+function changeDataAndSelector() {
+    changeData();
+    addOptionSelectors();
+}
 
+function setValuesMultiSelect() {
     var valuesMultiSelect = $('#multiselect1').val();
-
+    fillConnection = false;
+    namePlayer = false;
+    colorPlayer = false;
+    animateTeams = false;
+    connectionTeams = false;
+    neverTraded = false;
+    addNameToSelection = false;
+    onlyDrawSelected = false;
     if (valuesMultiSelect != null) {
-        fillConnection = false;
-        namePlayer = false;
-        colorPlayer = false;
-        animateTeams = false;
-        connectionTeams = false;
         for (var i = 0; i < valuesMultiSelect.length; i++) {
             var value = valuesMultiSelect[i];
             if (value == "connectionTeams") {
@@ -65,26 +67,48 @@ function changeData() {
             if (value == "animateTeams") {
                 animateTeams = true;
             }
+            if (value == "neverTraded") {
+                neverTraded = true;
+            }
+            if (value == "addNameToSelection") {
+                addNameToSelection = true;
+            }
+            if (value == "onlyDrawSelected") {
+                onlyDrawSelected = true;
+            }
         }
     }
+}
+
+function changeData() {
+    //console.log("Change Data Begins");
+    counterTotalConnections = 0;
+    dataArray = [];
+    playerInRange = [];
+    var dataRangesYear = getDataRanges();
+    var firstAge = parseInt(document.getElementById('firstAge').value);
+    var endAge = parseInt(document.getElementById('endAge').value);
+    var opacityLine = parseInt(document.getElementById('opacityLine').value);
+    numberConnections = parseInt(document.getElementById('numberConnections').value);
+    speedAnimate = parseInt(document.getElementById('speedAnimate').value);
+    countDrawIncrease = numberConnections;
+
+    setValuesMultiSelect();
 
     //Get Years Range Selection
     for (var ii = 0; ii < dataRangesYear.length; ii++) {
-        console.log("Data Year Range " + ii);
-
         dataRangeYear = dataRangesYear[ii];
         var firstYear = dataRangeYear.from;
         var endYear = dataRangeYear.to;
         //Filter to track Player Info at a time
         var nameCounter = 0;
         for (var i = 0; i < dataModelNames.length; i++) {
+            var name = dataModelNames[i].Name;
             var saveTeam = "";
-            var connectionnum = 0;
-
+            var connectionNum = 0;
             //Cover the list of seasons 
             for (var j = nameCounter; j < dataModel.length; j++) {
                 nameCounter++;
-                //console.log("Data Model Season " + dataModel[j].Player);
                 //Filter by parameters
 
                 //Skip TOT because is not a team, is the average of a player when play in two or more teams in one season
@@ -92,8 +116,9 @@ function changeData() {
                     continue;
                 }
 
-                if (!(dataModelNames[i].Name == dataModel[j].Player)) {
+                if (!(name == dataModel[j].Player)) {
                     //Data Models are sorted By Names
+                    playerInRange.push(name);
                     break;
                 }
 
@@ -109,7 +134,7 @@ function changeData() {
 
                     var yearColor = "";
 
-                    var valuesRGB = getGradientColor(dataRangeYear.color_from, dataRangeYear.color_to, endYear, firstYear, parseInt(dataModel[j].Year), opacityLine);
+                    var valuesRGB = getGradientColor(dataRangeYear.color_from, dataRangeYear.color_to, endYear, firstYear, parseInt(dataModel[j].Year), opacityLine, dataModel[j].Player);
 
                     yearColor = valuesRGB;
 
@@ -124,14 +149,24 @@ function changeData() {
                         "year": dataModel[j].Year,
                         "value": 1,
                         "color": yearColor,
-                        "connectionNum": connectionnum,
+                        "connectionNum": connectionNum,
                         "radDraw": 0,
                         "finishDraw": false,
                         "increaseSpeedDraw": (0.01 + (0.05 * Math.random()))
                     }
-                    connectionnum++;
-                    counterTotalConnections++;
-                    dataArray.push(jsonStruc);
+
+
+                    if (playerSelected.includes(jsonStruc.playerName) && onlyDrawSelected) {
+                        dataArray.push(jsonStruc);
+                        connectionNum++;
+                        counterTotalConnections++;
+                    }
+
+                    if (!onlyDrawSelected) {
+                        dataArray.push(jsonStruc);
+                        connectionNum++;
+                        counterTotalConnections++;
+                    }
 
                     saveTeam = dataModel[j].Tm;
                 } else {
@@ -142,13 +177,12 @@ function changeData() {
             saveTeam = "";
         }
     }
-    $(connectionNum).html(counterTotalConnections);
+
+    $("#connectionNum").html(counterTotalConnections);
     //Set Variable from Drawing in case the amount pick is larger than the length
     if (countDrawIncrease > dataArray.length) {
         countDrawIncrease = dataArray.length;
     }
-
-    console.log("End Process Json");
     createNode();
 }
 
@@ -165,7 +199,6 @@ function createNode() {
 
 function createNodes() {
     teamsArray = [];
-    console.log("Total Connections:" + counterTotalConnections);
     var maxTrade = 0;
     var minTrade = 1000000000;
     var radius = 5;
@@ -235,13 +268,9 @@ function createNodes() {
         team.x = sumSpace;
         sumSpace += team.width;
     }
-
-
-
 }
 
 function drawAnimate() {
-    console.log("Drawing");
     c.width = c.width;
     finishFlag = true;
 
@@ -258,12 +287,10 @@ function drawAnimate() {
                 saveFrom = team;
                 countFT++;
             }
-
             if (dataArray[i].to == team.id) {
                 saveTo = team;
                 countFT++;
             }
-
             if (countFT == 2) {
                 nodeColor = dataArray[i].color;
                 linewith = dataArray[i].connectionNum;
@@ -283,7 +310,6 @@ function drawAnimate() {
             } else {
                 ctx.arc(mid - teamRCOffset, saveFrom.y, (max - min) / 2, -dataArray[i].radDraw * Math.PI, 0, 0);
             }
-
             if (dataArray[i].radDraw < 1) {
                 dataArray[i].radDraw += dataArray[i].increaseSpeedDraw / (100 / speedAnimate);
                 if (dataArray[i].radDraw > 1) {
@@ -312,20 +338,15 @@ function drawAnimate() {
             ctx.fill();
             //Draw Border Line For comparizon
         }
-        if (namePlayer) {
+        if (playerSelected.includes(dataArray[i].playerName) || namePlayer) {
             ctx.fillStyle = "#000000";
             ctx.fillText(dataArray[i].playerName + " " + (linewith + 1), mid, saveFrom.y - (max - min) / 2 - 4);
         }
-
         if (!dataArray[i].finishDraw) {
             finishFlag = false;
         }
         ctx.restore();
     }
-
-    //DrawLine
-
-
     //Draw Node
     for (var i = 0; i < teamsArray.length; i++) {
         ctx.save();
@@ -345,7 +366,6 @@ function drawAnimate() {
         ctx.closePath();
         ctx.restore();
     }
-
     //Draw reference line for fill once
     if (fillConnection) {
         ctx.save();
@@ -360,15 +380,12 @@ function drawAnimate() {
         ctx.closePath();
         ctx.restore();
     }
-
     if (finishFlag) {
         clearInterval(animate);
-        console.log("End Draw");
     }
 }
 
-
-function getGradientColor(color1, color2, endYear, firstYear, currentYear, opacityLine) {
+function getGradientColor(color1, color2, endYear, firstYear, currentYear, opacityLine, playerName) {
     color1 = getRGBArray(color1);
     color2 = getRGBArray(color2);
 
@@ -387,11 +404,17 @@ function getGradientColor(color1, color2, endYear, firstYear, currentYear, opaci
 
     if (fillConnection) {
         var treshOpacity = ((0.01 + (1 / counterTotalConnections)) / (100 / opacityLine));
+
         if (treshOpacity == Infinity) {
-            treshOpacity = 0.001;
+            treshOpacity = 0.01;
         }
         var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + treshOpacity + ")";
     } else {
+
+        if (playerSelected.includes(playerName)) {
+            opacityLine = 100;
+        }
+
         var rgbaColor = "rgba(" + Math.round(valuesRGB[0]) + "," + Math.round(valuesRGB[1]) + "," + Math.round(valuesRGB[2]) + "," + (opacityLine / 100) + ")";
     }
     return rgbaColor;
@@ -418,28 +441,51 @@ function sortNodes() {
             break;
 
         case "trade_num":
-            console.log(key);
             teamsArray = teamsArray.sort((a, b) => (a.trade_num > b.trade_num) ? 1 : -1);
             break;
 
         case "min_temp":
-            console.log(key);
             teamsArray = teamsArray.sort((a, b) => (a.min_temp > b.min_temp) ? 1 : -1);
             break;
 
         case "max_temp":
-            console.log(key);
             teamsArray = teamsArray.sort((a, b) => (a.max_temp > b.max_temp) ? 1 : -1);
             break;
 
         case "avg_temp":
-            console.log(key);
             teamsArray = teamsArray.sort((a, b) => (a.avg_temp > b.avg_temp) ? 1 : -1);
             break;
 
         case "champ_wins":
-            console.log(key);
             teamsArray = teamsArray.sort((a, b) => (a.champ_wins > b.champ_wins) ? 1 : -1);
             break;
     }
 }
+
+function addOptionSelectors() {
+    console.log("Change Select");
+    var options = [];
+
+    for (var i = 0; i < playerInRange.length; i++) {
+        var option = "";
+        if (playerSelected.includes(playerInRange[i])) {
+            option = '<option value="' + playerInRange[i] + '" selected>' + playerInRange[i] + '</option>';
+        } else {
+            option = '<option value="' + playerInRange[i] + '">' + playerInRange[i] + '</option>';
+        }
+        options.push(option);
+    }
+    _options = options.join('');
+    $('#playerSelect').html(_options);
+    $('#playerSelect').selectpicker('refresh');
+}
+
+$('#playerSelect').change(function () {
+    $('#playerSelect').selectpicker('refresh');
+    var playerSelectedHtml = $('#playerSelect').val();
+    playerSelected = playerSelectedHtml;
+    if (playerSelected == null) {
+        playerSelected = [];
+    }
+    changeData();
+});

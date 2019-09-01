@@ -12,17 +12,29 @@ canvas {
 .IO-UI-token-container {
     margin: auto;
     position: absolute !important;
-    z-index: 100 !important;
+    z-index: 1 !important;
 }
 
-.IO-UI-input-bar {
-    margin-top: 15px;
+.selectpicker,
+.form-horizontal,
+.form-group {
+    width: 100%;
+    position: absolute!important;
+}
+
+.menu-container {
+    margin-bottom: 30px;
+}
+
+.bar-container {
+    margin-top: 35px;
 }
 
 .IO-UI-input-info-fade {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
-.range-container {
-    margin-top: 10px;
+.IO-UI-input-add-range-btn {
+    margin-top: 22px;
+    font-size: 12px;
 }
