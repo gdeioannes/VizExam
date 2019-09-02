@@ -1,0 +1,40 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    overflow: hidden;
+}
+
+canvas {
+    top: 0px;
+    position: absolute;
+    z-index: -1;
+}
+
+.IO-UI-token-container {
+    margin: auto;
+    position: absolute !important;
+    z-index: 1 !important;
+}
+
+.selectpicker,
+.form-horizontal,
+.form-group {
+    width: 100%;
+    position: absolute!important;
+}
+
+.menu-container {
+    margin-bottom: 30px;
+}
+
+.bar-container {
+    margin-top: 35px;
+}
+
+.IO-UI-input-info-fade {
+    margin-top: 20px;
+}
+
+.IO-UI-input-add-range-btn {
+    margin-top: 22px;
+    font-size: 12px;
+}

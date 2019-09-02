@@ -1,6 +1,6 @@
         var colorPick = "";
         var min = 1950;
-        var max = 2017;
+        var max = 2018;
         //Value to fix a value with min a max over the bar, is the toke with/9
         var ofsetTokenPos = 9;
         var colorPicker = new iro.ColorPicker("#color-picker-container", {

@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="IO-UI/IO-UI-style.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bootstrap-select-1.13.9/css/bootstrap-select.css">
+    <link rel="stylesheet" href="css/bootstrap3.css">
+    <link rel="stylesheet" href="css/bootstrap-select.css">
 </head>
 
 <body>
@@ -24,15 +24,12 @@
             <form class="form-horizontal" role="form">
                 <div class="form-group">
                     <select class="selectpicker form-control nba-filter" id="multiselect1" title="Select Drawin" multiple>
-                        
                     <option value="connectionTeams">Only Teams with trades</option>
                     <option value="fillConnection">Fill Connections</option>
                     <option value="animateTeams">Animate Connections</option>
                     <option value="onlyDrawSelected">Only selected player</option>
                     <option value="namePlayer">Name Players</option>
                     <option value="colorPlayer">Color Player</option>
-                    <option value="neverTraded">Never Traded</option>
-                        
                 </select>
                 </div>
             </form>
@@ -56,7 +53,7 @@
         <div class="col-sm-3">
             <label>Options:</label>
             <br> AGE: <input id="firstAge" class="nba-filter" type="number" placeholder="Firt Age" min="18" max="44" value="18"><input id="endAge" class="nba-filter" type="number" placeholder="End Age" min="18" max="44" value="44"> Opacity
-            <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="1" max="100" step="5" value="50">
+            <input id="opacityLine" class="nba-filter" type="number" placeholder="Firt Age" min="1" max="100" step="5" value="15">
         </div>
 
         <div class="col-sm-3">
@@ -105,14 +102,14 @@
 
     <canvas id="myCanvas" />
     <!--<button onclick="changeData()">Change Data</button>-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="bootstrap-select-1.13.9/js/bootstrap-select.js"></script>
-    <script src="data.js"></script>
+    <script src="Js/jquery-3.4.1.min.js"></script>
+    <script src="Js/bootstrap3.js"></script>
+    <script src="Js/jquey-ui.js"></script>
+    <script src="Js/bootstrap-select.js"></script>
+    <script src="Js/data.js"></script>
     <script src="IO-UI/color-picker-master/iro.min.js"></script>
     <script src="IO-UI/IO-UI.js"></script>
-    <script src="vis.js"></script>
+    <script src="Js/vis.js"></script>
 </body>
 
 </html>
