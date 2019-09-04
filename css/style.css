@@ -3,7 +3,7 @@ body {
     overflow: hidden;
 }
 
-canvas {
+#myCanvas {
     top: 0px;
     position: absolute;
     z-index: -1;
@@ -37,4 +37,16 @@ canvas {
 .IO-UI-input-add-range-btn {
     margin-top: 22px;
     font-size: 12px;
+}
+
+.range-pick {
+    position: absolute;
+    z-index: 100;
+    bottom: 10px;
+    width: 25%;
+    margin-left: 50%;
+}
+
+.range-pick input {
+    margin-left: -50%;
 }

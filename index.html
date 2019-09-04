@@ -26,10 +26,14 @@
                     <select class="selectpicker form-control nba-filter" id="multiselect1" title="Select Drawin" multiple>
                     <option value="connectionTeams">Only Teams with trades</option>
                     <option value="fillConnection">Fill Connections</option>
-                    <option value="animateTeams">Animate Connections</option>
+                    <!--<option value="connectionsOverTeams">Draw Team to Team Connection</option>-->
                     <option value="onlyDrawSelected">Only selected player</option>
+                    <option value="selectPlayerMouse">-Selected player with mouse</option>
+                    <option value="deSelectPlayerMouse">-Deselected player with mouse</option>
+                    <option value="animateTeams">Animate Connections</option>
                     <option value="namePlayer">Name Players</option>
                     <option value="colorPlayer">Color Player</option>
+                    <option value="teamFullName">Team Full Name</option>
                 </select>
                 </div>
             </form>
@@ -59,8 +63,8 @@
         <div class="col-sm-3">
             <label>Animation Options:</label>
             <br>N Connections
-            <input id="numberConnections" class="nba-filter" type="number" min="0" max="400000" value="500"> Speed
-            <input id="speedAnimate" class="nba-filter" type="number" min="0" max="100" value="100">
+            <input step="10" id="numberConnections" type="number" min="1" max="5500" value="500"> Speed
+            <input id="speedAnimation" type="number" min="1" max="100" value="100" step="10">
         </div>
 
         <div class="col-sm-1"></div>
@@ -98,8 +102,9 @@
             <div id="color-picker-container"><button class="IO-UI-delete-btn">DELETE</button></div>
         </div>
     </div>
-
-
+    <!--<div class="range-pick">
+        <input id="rangeZoom" type="range" value="0">
+    </div>-->
     <canvas id="myCanvas" />
     <!--<button onclick="changeData()">Change Data</button>-->
     <script src="Js/jquery-3.4.1.min.js"></script>

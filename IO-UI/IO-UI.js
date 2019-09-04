@@ -38,6 +38,23 @@
         uiToken.css("left", leftEnd);
         uiToken.css("top", topEnd);
 
+
+        function reCalculeValues() {
+            uIContainer = $(".IO-UI-input-bar-container");
+            uiTokenContainer = uIContainer.find(".IO-UI-token-container");
+            uiRangeContainer = uIContainer.find(".IO-UI-container-range");
+            uiTokenBar = uIContainer.find(".IO-UI-input-bar");
+            uiToken = uiTokenContainer.find(".IO-UI-token");
+            colorPicker = $("#color-picker-container");
+            infoText = $("#IO-UI-input-info-text");
+            colorPicker.hide();
+            leftStart = uiTokenContainer.offset().left;
+            leftEnd = uiTokenContainer.offset().left + uiTokenBar.width() / 2 - uiToken.width();
+            topEnd = uiTokenBar.offset().top - uiTokenBar.height() / 2;
+            uiToken.css("left", leftEnd);
+            uiToken.css("top", topEnd);
+        }
+
         makeDragables();
 
         function makeDragables() {
@@ -172,6 +189,7 @@
                 changeUIDragElements($(mToke))
                 moveRange($(mToke));
             }
+            reCalculeValues();
         });
 
         function changeInfoTextFade(text) {

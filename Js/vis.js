@@ -1,13 +1,23 @@
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
-ctx.scale = 0.5;
+// SaveCanvas
+var imgData;
+
 //Data Vars
 var dataArray = [];
 var teamsArray = [];
+var teamsDictionary = [];
 var playerInRange = [];
 var playersNotTraded = [];
 var playersNotTradedInfo = [];
 var playerSelected = [];
+
+//Mouse
+var mousePosX = 0;
+var mousePosY = 0;
+var mouseDown = false;
+var mouseUp = false;
+
 //UI Vars
 var animateTeams = false;
 var namePlayer = false;
@@ -16,32 +26,42 @@ var fillConnection = false;
 var colorPlayer = false;
 var neverTraded = false;
 var onlyDrawSelected = false;
+var selectPlayerMouse = false;
+var deSelectPlayerMouse = false;
+var teamFullName = false;
+var connectionsOverTeams = false;
+
 //Drawing and Animation Vars
-var speedAnimate = 100;
+var speedAnimation = 100;
 var milisecondsSpeed = 50;
-var animate = setInterval(drawAnimate, milisecondsSpeed);
-var countDrawIncrease = 500;
-var countDrawInterval = countDrawIncrease;
-var numberConnections = 0;
-var finishFlag = false;
+//Store Interval Object
+var animate;
+//Number of connections to animate at the same time
+var numberConnections = 500;
+var zoom = 0;
+
+//This variable tracks how many connections are animated at the same time
+var countDrawInterval = numberConnections;
 var yearData = document.getElementById('yearData');
-//Debug vars
 var counterTotalConnections = 0;
-var connectionNum = document.getElementById('connectionNum')
+var finishFlag = false;
+//CanvasDrawing vars
 var offsetX = 200;
 var posNodesY = window.innerHeight * 0.875;
-var dataRangesYear;
-//Charge the data for UI
+
+//Initialize Functions
 changeData();
 addOptionSelectors();
-
+getPlayersNeverTraded();
 
 //Function that retrieves the data and create and fills the dataArray with the data for the specific query
 function changeDataAndSelector() {
     changeData();
+    drawAnimate();
     addOptionSelectors();
 }
 
+//Function Callers when the drawing multiselect changes
 function setValuesMultiSelect() {
     var valuesMultiSelect = $('#multiselect1').val();
     fillConnection = false;
@@ -51,6 +71,10 @@ function setValuesMultiSelect() {
     connectionTeams = false;
     neverTraded = false;
     onlyDrawSelected = false;
+    selectPlayerMouse = false;
+    deSelectPlayerMouse = false;
+    teamFullName = false;
+    connectionsOverTeams = false;
     if (valuesMultiSelect != null) {
         for (var i = 0; i < valuesMultiSelect.length; i++) {
             var value = valuesMultiSelect[i];
@@ -67,6 +91,8 @@ function setValuesMultiSelect() {
                 colorPlayer = true;
             }
             if (value == "animateTeams") {
+                clearInterval(animate);
+                animate = setInterval(drawAnimate, milisecondsSpeed);
                 animateTeams = true;
             }
             if (value == "neverTraded") {
@@ -75,22 +101,36 @@ function setValuesMultiSelect() {
             if (value == "onlyDrawSelected") {
                 onlyDrawSelected = true;
             }
+            if (value == "deSelectPlayerMouse") {
+                deSelectPlayerMouse = true;
+            }
+            if (value == "selectPlayerMouse") {
+                selectPlayerMouse = true;
+            }
+            if (value == "teamFullName") {
+                teamFullName = true;
+            }
+            if (value == "connectionsOverTeams") {
+                connectionsOverTeams = true;
+            }
         }
     }
 }
 
+
 function changeData() {
-    //console.log("Change Data Begins");
+    //Set Vars Values
     counterTotalConnections = 0;
     dataArray = [];
+    teamsDictionary = [];
+    //Stores player in range for Select
     playerInRange = [];
-    dataRangesYear = getDataRanges();
+    var dataRangesYear = getDataRanges();
     var firstAge = parseInt(document.getElementById('firstAge').value);
     var endAge = parseInt(document.getElementById('endAge').value);
     var opacityLine = parseInt(document.getElementById('opacityLine').value);
     numberConnections = parseInt(document.getElementById('numberConnections').value);
-    speedAnimate = parseInt(document.getElementById('speedAnimate').value);
-    countDrawIncrease = numberConnections;
+    speedAnimation = parseInt(document.getElementById('speedAnimation').value);
 
     setValuesMultiSelect();
     //Get Years Range Selection
@@ -110,26 +150,21 @@ function changeData() {
                 nameCounter++;
                 dataM = dataModel[nameCounter];
                 //Filter by parameters
-
                 //Skip TOT because is not a team, is the average of a player when play in two or more teams in one season
                 if (dataM.Tm == "TOT") {
                     continue;
                 }
-
                 if (!(name == dataM.Player)) {
                     //Data Models are sorted By Names
                     break;
                 }
-
                 if (!(dataM.Year >= dataRangeYear.from && dataM.Year <= dataRangeYear.to)) {
                     continue;
                 }
-
                 pushToNamesRange(name);
                 if (!(dataM.Age >= firstAge && dataM.Age <= endAge)) {
                     continue;
                 }
-
                 //Track Trade and Add the data of the teams
                 if (dataM.Tm != saveTeam && saveTeam != "") {
 
@@ -151,9 +186,13 @@ function changeData() {
                         "value": 1,
                         "color": yearColor,
                         "connectionNum": connectionNum,
+                        "age": dataM.Age,
                         "radDraw": 0,
                         "finishDraw": false,
-                        "increaseSpeedDraw": (0.01 + (0.05 * Math.random()))
+                        "increaseSpeedDraw": (0.01 + (0.05 * Math.random())),
+                        "directionCharLeft": "<",
+                        "directionCharRight": ">",
+                        "mouseSelected": false
                     }
 
 
@@ -180,12 +219,13 @@ function changeData() {
         }
     }
 
-    $("#connectionNum").html(counterTotalConnections);
     //Set Variable from Drawing in case the amount pick is larger than the length
-    if (countDrawIncrease > dataArray.length) {
-        countDrawIncrease = dataArray.length;
+    if (numberConnections > dataArray.length) {
+        numberConnections = dataArray.length;
     }
     createNode();
+    drawAnimate();
+    $("#connectionNum").html(counterTotalConnections);
 }
 
 function pushToNamesRange(name) {
@@ -200,9 +240,7 @@ function createNode() {
 
     c.width = window.innerWidth;
     c.height = window.innerHeight;
-    countDrawInterval = countDrawIncrease;
-    clearInterval(animate);
-    animate = setInterval(drawAnimate, milisecondsSpeed);
+    countDrawInterval = numberConnections;
 }
 
 function createNodes() {
@@ -253,6 +291,7 @@ function createNodes() {
             var team = teamsData[i];
             if (team.trade_num > 0) {
                 teamsArray.push(team);
+                teamsDictionary[team.id] = team;
             }
         }
     } else {
@@ -260,6 +299,7 @@ function createNodes() {
             if (teamsData[i].id != "TOT") {
                 var team = teamsData[i];
                 teamsArray.push(team);
+                teamsDictionary[team.id] = team;
             }
         }
     }
@@ -281,16 +321,22 @@ function createNodes() {
 function drawAnimate() {
     c.width = c.width;
     finishFlag = true;
-
     //Draw connections
     drawConnections();
     drawPlayersNeverTraded();
-    drawNodes();
     drawFillLine();
+    drawNodes();
+    if (!animateTeams) {
+        drawConnectionOverTeams();
+    }
     if (finishFlag) {
         clearInterval(animate);
     }
+
+    imgData = ctx.getImageData(0, 0, c.width, c.height);
 }
+
+
 
 function drawConnections() {
 
@@ -301,67 +347,87 @@ function drawConnections() {
         var nodeColor = "";
         var linewith = 0;
         //Check the data from and to and save Values
-        for (var j = 0; j < teamsArray.length; j++) {
-            var team = teamsArray[j];
-            if (dataArray[i].from == team.id) {
-                saveFrom = team;
-                countFT++;
-            }
-            if (dataArray[i].to == team.id) {
-                saveTo = team;
-                countFT++;
-            }
-            if (countFT == 2) {
-                nodeColor = dataArray[i].color;
-                linewith = dataArray[i].connectionNum;
-                break;
-            }
-        }
 
-        ctx.beginPath();
+        saveFrom = teamsDictionary[dataArray[i].from];
+        saveTo = teamsDictionary[dataArray[i].to];
+        nodeColor = dataArray[i].color;
+        linewith = dataArray[i].connectionNum;
+
+
         var max = Math.max(saveFrom.x + saveFrom.width / 2, saveTo.x + saveTo.width / 2);
         var min = Math.min(saveFrom.x + saveFrom.width / 2, saveTo.x + saveTo.width / 2);
         var mid = min + (max - min) / 2;
 
         //Team Ratio Connection offset
         var teamRCOffset = 0;
+        //Direction Char
+
+        if (saveFrom.x > saveTo.x) {
+            //Draw Arc to the Left
+            dataArray[i].directionCharRight = "";
+            dataArray[i].directionCharLeft = ">";
+        } else {
+            dataArray[i].directionCharRight = "<";
+            dataArray[i].directionCharLeft = "";
+        }
         if (animateTeams) {
+
             if (saveFrom.x > saveTo.x) {
+                //Draw Arc to the Left
+                ctx.beginPath();
                 ctx.arc(mid - teamRCOffset, saveFrom.y, (max - min) / 2, Math.PI * (1 + dataArray[i].radDraw), Math.PI, true);
+                ctx.strokeStyle = nodeColor;
+                ctx.stroke();
+                ctx.lineWidth = linewith * 0.5;
+                ctx.closePath();
+
             } else {
+                //Draw Arc to the Rigth
+                ctx.beginPath();
                 ctx.arc(mid - teamRCOffset, saveFrom.y, (max - min) / 2, -dataArray[i].radDraw * Math.PI, 0, 0);
+                ctx.strokeStyle = nodeColor;
+                ctx.stroke();
+                ctx.lineWidth = linewith * 0.5;
+                ctx.closePath();
+
             }
             if (dataArray[i].radDraw < 1) {
-                dataArray[i].radDraw += dataArray[i].increaseSpeedDraw / (100 / speedAnimate);
-                if (dataArray[i].radDraw > 1) {
-                    dataArray[i].radDraw = 1;
-                    dataArray[i].finishDraw = true;
-                    if (countDrawInterval + 1 <= dataArray.length) {
-                        countDrawInterval++;
-                        $(yearData).html("Year " + dataArray[i].year);
-                    }
+                dataArray[i].radDraw += dataArray[i].increaseSpeedDraw / (100 / speedAnimation);
+
+            }
+            if (dataArray[i].radDraw > 1) {
+                dataArray[i].radDraw = 1;
+                dataArray[i].finishDraw = true;
+                if (countDrawInterval + 1 <= dataArray.length) {
+                    countDrawInterval++;
+                    $(yearData).html("Year " + dataArray[i].year);
                 }
             }
+
         } else {
             countDrawInterval = dataArray.length;
+            ctx.beginPath();
             ctx.arc(mid - teamRCOffset, saveTo.y, (max - min) / 2, 0, Math.PI * 1, true);
+            ctx.strokeStyle = nodeColor;
+            ctx.stroke();
+            ctx.lineWidth = linewith * 0.5;
             dataArray[i].finishDraw = true;
             finishFlag = true;
         }
 
-        ctx.lineWidth = linewith * 0.5;
-        ctx.strokeStyle = nodeColor;
-        ctx.textAlign = "center";
-        ctx.stroke();
-        ctx.closePath();
+
+
         if (fillConnection) {
             ctx.fillStyle = nodeColor;
             ctx.fill();
-            //Draw Border Line For comparizon
         }
-        if (playerSelected.includes(dataArray[i].playerName) || namePlayer) {
+
+        if (playerSelected.includes(dataArray[i].playerName) || namePlayer || dataArray[i].mouseSelected) {
+            ctx.beginPath();
+            ctx.textAlign = "center";
             ctx.fillStyle = "#000000";
-            ctx.fillText(dataArray[i].playerName + " " + (linewith + 1), mid, saveFrom.y - (max - min) / 2 - 4);
+            ctx.fillText(dataArray[i].directionCharRight + " " + dataArray[i].playerName + " " + dataArray[i].directionCharLeft + " " + dataArray[i].age + " / " + (dataArray[i].connectionNum + 1 + " " + dataArray[i].year), mid, saveFrom.y - (max - min) / 2 - 4);
+            ctx.closePath();
         }
         if (!dataArray[i].finishDraw) {
             finishFlag = false;
@@ -377,13 +443,21 @@ function drawNodes() {
         ctx.beginPath();
         ctx.fillStyle = "#" + team.color_1;
         ctx.rect(team.x, team.y, team.width, 20);
-        //ctx.arc(node.x + node.width / 2, node.y, node.width / 2, 0, Math.PI * 2, 0);
         ctx.save();
-        //ctx.translate(node.x - 5 + node.width / 2, node.y + node.width / 2 + 20);
         ctx.translate(team.x - 5 + team.width / 2, team.y + 30);
-        ctx.rotate(Math.PI * 0.5);
+        if (teamFullName) {
+            ctx.rotate(Math.PI * 0.25);
+        } else {
+            ctx.rotate(Math.PI * 0.5);
+        }
         ctx.textAlign = "left"
-        ctx.fillText(team.id, 0, 0);
+        var name = ""
+        if (teamFullName) {
+            name = teamsDictionary[team.id].team_name;
+        } else {
+            name = team.id;
+        }
+        ctx.fillText(name, 0, 0);
         ctx.restore();
         ctx.fill();
         ctx.closePath();
@@ -406,31 +480,22 @@ function drawFillLine() {
 }
 
 function drawPlayersNeverTraded() {
-    console.log("Draw Never Traded");
     for (var i = 0; i < playersNotTradedInfo.length; i++) {
-
-        if (playerSelected.includes("" + playersNotTraded[i])) {
-            var x = 100;
-            var y = 100;
-            for (var j = 0; j < teamsArray.length; j++) {
-                if (teamsArray[j].id == playersNotTradedInfo[i].from) {
-                    x = teamsArray[j].x + teamsArray[j].width / 2;
-                    y = teamsArray[j].y;
-                    teamsArray[j].trade_num = 2000;
-                    break;
-                }
-            }
-            var data = playersNotTraded[i];
+        if (playerSelected.includes(playersNotTraded[i])) {
+            var data = playersNotTradedInfo[i].from;
+            var teamSelect = teamsDictionary[data];
+            var x = teamSelect.x + teamSelect.width / 2;
+            var y = teamSelect.y;
 
             ctx.beginPath();
             ctx.strokeWidth = 1;
             ctx.moveTo(x, y);
             ctx.lineTo(x, y - 20);
-            ctx.strokeStyle = "#00000";
+            ctx.strokeStyle = "#000000";
             ctx.stroke();
             ctx.closePath();
-            ctx.fillStyle = "#00000";
-            ctx.fillText(data, x, y - 25);
+            ctx.fillStyle = "#000000";
+            ctx.fillText(playersNotTraded[i], x, y - 25);
             //ctx.arc(100, 100, 3, 0, Math.PI * 2, true)
             ctx.fill();
         }
@@ -490,12 +555,11 @@ $(".nba-filter").change(function () {
     changeData();
 });
 
-
 function sortNodes() {
     var key = $('#sortSelector').val();
     switch (key) {
         case "old_new":
-            teamsArray = teamsArray.sort((a, b) => (a.order > b.order) ? 1 : -1);
+            teamsArray = teamsArray.sort((a, b) => (a.year_1 > b.year_1) ? 1 : -1);
             break;
 
         case "trade_num":
@@ -548,11 +612,8 @@ $('#playerSelect').change(function () {
     changeData();
 });
 
-getPlayersNeverTraded();
-
 function getPlayersNeverTraded() {
     var nameCounter = 0;
-
     for (var i = 0; i < dataModelNames.length; i++) {
         var name = dataModelNames[i].Name;
         var saveTeam = "";
@@ -561,20 +622,16 @@ function getPlayersNeverTraded() {
         //Cover the list of seasons 
         while (nameCounter < dataModel.length - 1) {
             nameCounter++;
-
             if (saveTeam == "") {
                 saveTeam = dataModel[nameCounter].Tm;
                 continue;
             }
-
             if (saveTeam != dataModel[nameCounter].Tm) {
                 connectionNum++;
             }
-
             if (name != dataModel[nameCounter].Player) {
                 break
             }
-
         }
         if (connectionNum <= 1) {
             var info = {
@@ -585,5 +642,187 @@ function getPlayersNeverTraded() {
             playersNotTraded.push(name);
         }
     }
+}
 
+$("#numberConnections").change(function () {
+    numberConnections = parseInt($("#numberConnections").val());
+    if ((countDrawInterval + numberConnections) < dataArray.length) {
+        countDrawInterval += numberConnections;
+    } else {
+        countDrawInterval = dataArray.length;
+    }
+});
+
+$("#speedAnimation").change(function () {
+    speedAnimation = parseInt($("#speedAnimation").val());
+});
+
+setInterval(drawSelectorSquare, 30);
+
+var saveMousePosX = 0;
+var saveMousePosY = 0;
+
+function drawSelectorSquare() {
+
+}
+
+$("#myCanvas").mousedown(function () {
+    mouseDown = true;
+    mouseUp = false;
+});
+
+$("#myCanvas").mouseup(function () {
+    mouseDown = false;
+    mouseUp = true;
+
+    for (var i = 0; i < dataArray.length; i++) {
+        var data = dataArray[i];
+        var dataFrom = teamsDictionary[dataArray[i].from];
+        var dataTo = teamsDictionary[dataArray[i].to];
+        var dataX = dataFrom.x + Math.abs(dataTo.x - dataFrom.x) / 2;
+        var dataW = Math.abs(dataTo.x - dataFrom.x) / 2;
+
+        var catOne = Math.pow(dataX - saveMousePosX, 2);
+        var catTwo = Math.pow(dataFrom.y - saveMousePosY, 2);
+        var distance = Math.sqrt(catTwo + catOne);
+
+        var mouseW = Math.sqrt(Math.pow((mousePosX - saveMousePosX), 2) + Math.pow((mousePosY - saveMousePosY), 2));
+
+        if ((distance - dataW - mouseW) < 0 && distance + mouseW > dataW) {
+
+            if (!selectPlayerMouse && !deSelectPlayerMouse) {
+                data.mouseSelected = true;
+            }
+
+            if (selectPlayerMouse && !deSelectPlayerMouse && !playerSelected.includes(data.playerName)) {
+                playerSelected.push(data.playerName);
+            }
+
+            if (deSelectPlayerMouse && playerSelected.includes(data.playerName)) {
+                playerSelected = playerSelected.filter(e => e !== data.playerName);
+            }
+        } else {
+            data.mouseSelected = false;
+        }
+    }
+    if (deSelectPlayerMouse || selectPlayerMouse) {
+        changeDataAndSelector();
+    }
+    c.width = c.width;
+    drawAnimate();
+});
+
+$("myCanvas").scroll(function () {
+    console.log("Hola");
+});
+
+$("#myCanvas").mousemove(function (event) {
+    mousePosX = event.pageX;
+    mousePosY = event.pageY;
+
+    if (mouseDown) {
+        ctx.putImageData(imgData, 0, 0);
+        ctx.beginPath()
+        ctx.strokeStyle = "#FF0000";
+        ctx.strokeWidth = 5;
+        ctx.arc(saveMousePosX, saveMousePosY, Math.sqrt(Math.pow((mousePosX - saveMousePosX), 2) + Math.pow((mousePosY - saveMousePosY), 2)), 0, Math.PI * 2, false);
+        ctx.stroke();
+    } else {
+        saveMousePosX = mousePosX;
+        saveMousePosY = mousePosY;
+    }
+});
+
+$("#rangeZoom").change(function () {
+    var zoom = $("#rangeZoom").val();
+    offsetX = 200 - zoom * 10;
+    changeData();
+});
+
+
+function drawConnectionOverTeams() {
+    var dataTeamsConnections = [];
+    var dataTeamsTrades = [];
+    var playersDic = [];
+    var countTotalConnections = 0;
+
+
+    for (var i = 0; i < dataModelNames.length; i++) {
+        var dic = {
+            "tradeNum": 0
+
+        }
+        playersDic[dataModelNames[i].Name] = dic;
+    }
+
+    for (var i = 0; i < teamsArray.length; i++) {
+        var dic = {
+            "tradeNum": 0
+
+        }
+        dataTeamsTrades[teamsArray[i].id] = dic;
+        for (var j = 0; j < teamsArray.length; j++) {
+            var dicConnection = {
+                "tradeNum": 0
+            }
+            dataTeamsConnections[teamsArray[i].id + teamsArray[j].id] = dicConnection;
+        }
+    }
+
+    var max = 0;
+    var playerName = 0;
+    for (var i = 0; i < dataArray.length; i++) {
+        var con = dataTeamsConnections[dataArray[i].from + dataArray[i].to];
+        con.tradeNum = con.tradeNum + 1;
+        var team = dataTeamsTrades[dataArray[i].from];
+        team.tradeNum = team.tradeNum + 1;
+        var player = playersDic[dataArray[i].playerName];
+        player.tradeNum = player.tradeNum + 1;
+        if (max < player.tradeNum) {
+            playerName = dataArray[i].playerName;
+            max = player.tradeNum;
+        }
+        countTotalConnections++;
+    }
+
+    var playerCounter = 0;
+    for (var key in playersDic) {
+        if (playersDic[key].tradeNum > 0) {
+            playerCounter++;
+        }
+    }
+    var avg = Math.round(countTotalConnections / playerCounter * 100) / 100;
+
+    var x = offsetX;
+    var y = 300;
+    var offSetText = 15;
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#000000";
+    ctx.fillText("Max Trades:" + max, x, y);
+    ctx.fillText("Player:" + playerName, x, y + offSetText);
+    ctx.fillText("Avg trades:" + avg, x, y + offSetText * 2);
+}
+
+
+
+/*var firstTeam = teamsArray[i];
+ var lastTeam = teamsArray[teamsArray.length - i - 1];
+ drawfromTo(firstTeam, lastTeam);*/
+
+function drawfromTo(firstTeam, lastTeam) {
+
+    var c1X = firstTeam.x + ((lastTeam.x - firstTeam.x) + lastTeam.width) / 2;
+    var c1Y = firstTeam.y;
+    var c1W = (lastTeam.x - firstTeam.x + lastTeam.width) / 2;
+
+    var c2X = (firstTeam.x + firstTeam.width) + (lastTeam.x - (firstTeam.x + firstTeam.width)) / 2;
+    var c2Y = firstTeam.y;
+    var c2W = lastTeam.x - (firstTeam.x + firstTeam.width);
+
+    ctx.beginPath();
+    ctx.arc(c1X, c1Y, c1W, 0, 1 * Math.PI, true);
+    ctx.arc(c2X, c2Y, c2W / 2, Math.PI, 2 * Math.PI, false);
+    ctx.fillStyle = "#" + firstTeam.color_1;
+    ctx.fill();
+    ctx.closePath();
 }
