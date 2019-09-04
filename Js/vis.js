@@ -133,15 +133,16 @@ function changeData() {
     speedAnimation = parseInt(document.getElementById('speedAnimation').value);
 
     setValuesMultiSelect();
+
     //Get Years Range Selection
-    for (var ii = 0; ii < dataRangesYear.length; ii++) {
-        dataRangeYear = dataRangesYear[ii];
+    for (var i = 0; i < dataRangesYear.length; i++) {
+        dataRangeYear = dataRangesYear[i];
         var firstYear = dataRangeYear.from;
         var endYear = dataRangeYear.to;
         //Filter to track Player Info at a time
         var nameCounter = 0;
-        for (var i = 0; i < dataModelNames.length; i++) {
-            var name = dataModelNames[i].Name;
+        for (var j = 0; j < dataModelNames.length; j++) {
+            var name = dataModelNames[j].Name;
             var saveTeam = "";
             var connectionNum = 0;
             //Cover the list of seasons 
@@ -162,6 +163,7 @@ function changeData() {
                     continue;
                 }
                 pushToNamesRange(name);
+
                 if (!(dataM.Age >= firstAge && dataM.Age <= endAge)) {
                     continue;
                 }
@@ -791,6 +793,23 @@ function drawConnectionOverTeams() {
             playerCounter++;
         }
     }
+
+    console.log(dataArray);
+    var yearStatsArray = [];
+    var sumCheck = 0;
+    for (var i = 18; i < 44; i++) {
+        yearStatsArray[i] = 0;
+        for (var ii = 0; ii < dataArray.length; ii++) {
+            if (dataArray[ii].age == i && !playersNotTraded.includes(dataArray[ii].playerName)) {
+                yearStatsArray[i] = yearStatsArray[i] + 1;
+            }
+        }
+        sumCheck += yearStatsArray[i];
+    }
+
+    console.log(sumCheck);
+    console.log(yearStatsArray);
+
     var avg = Math.round(countTotalConnections / playerCounter * 100) / 100;
 
     var x = offsetX;
@@ -801,6 +820,7 @@ function drawConnectionOverTeams() {
     ctx.fillText("Max Trades:" + max, x, y);
     ctx.fillText("Player:" + playerName, x, y + offSetText);
     ctx.fillText("Avg trades:" + avg, x, y + offSetText * 2);
+
 }
 
 
