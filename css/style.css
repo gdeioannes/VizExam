@@ -6,7 +6,7 @@ body {
 #myCanvas {
     top: 0px;
     position: absolute;
-    z-index: -1;
+    z-index: -100 !important;
 }
 
 .IO-UI-token-container {

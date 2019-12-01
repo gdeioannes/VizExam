@@ -1,5 +1,8 @@
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
+
+c.width = window.innerWidth;
+c.height = window.innerHeight;
 // SaveCanvas
 var imgData;
 
@@ -125,6 +128,7 @@ function changeData() {
     //Stores player in range for Select
     playerInRange = [];
     var dataRangesYear = getDataRanges();
+
     var firstAge = parseInt(document.getElementById('firstAge').value);
     var endAge = parseInt(document.getElementById('endAge').value);
     var opacityLine = parseInt(document.getElementById('opacityLine').value);
@@ -133,82 +137,115 @@ function changeData() {
 
     setValuesMultiSelect();
 
-    //Get Years Range Selection
+    console.log("Debug Begin");
     for (var i = 0; i < dataRangesYear.length; i++) {
         dataRangeYear = dataRangesYear[i];
         var firstYear = dataRangeYear.from;
         var endYear = dataRangeYear.to;
+        console.log("D-Year F:" + firstYear + " Year E:" + endYear);
+
+        //Filter to track Player Info at a time
+        var nameCounter = 0;
+        for (var j = nameCounter; j < dataModelNames.length; j++) {
+            //Record the name of the player, the team is set empty and the connection 
+            //is set to 0
+            var name = dataModelNames[j].playerName;
+            var saveTeam = "";
+            var connectionNum = 0;
+            if (nameCounter < dataModelNames.length) {
+                nameCounter++;
+            } else {
+                break;
+            }
+            for (var k = 0; k < dataModel.length; k++) {
+
+            }
+
+        }
+    }
+
+    console.log("Debug End");
+
+    //Get Years Range Selection
+    for (var yearCount = 0; yearCount < dataRangesYear.length; yearCount++) {
+        dataRangeYear = dataRangesYear[yearCount];
+        var firstYear = dataRangeYear.from;
+        var endYear = dataRangeYear.to;
+        console.log("Year F:" + firstYear + " Year E:" + endYear);
         //Filter to track Player Info at a time
         var nameCounter = 0;
         for (var j = 0; j < dataModelNames.length; j++) {
             var name = dataModelNames[j].playerName;
             var saveTeam = "";
             var connectionNum = 0;
-            //Cover the list of seasons 
-            var dataM;
-            while (nameCounter < dataModel.length) {
+
+            for (var i = nameCounter; i < dataModel.length; i++) {
                 nameCounter++;
-                dataM = dataModel[nameCounter];
+                //Cover the list of seasons 
+                var dataM = dataModel[nameCounter];
                 //Filter by parameters
                 //Skip TOT because is not a team, is the average of a player when play in two or more teams in one season
                 if (dataM.tm == "TOT") {
                     continue;
                 }
+
                 if (!(name == dataM.playerName)) {
                     //Data Models are sorted By Names
                     break;
                 }
+
                 if (!(dataM.year >= dataRangeYear.from && dataM.year <= dataRangeYear.to)) {
                     continue;
                 }
+
                 pushToNamesRange(name);
 
-                if (!(dataM.age >= firstAge && dataM.age <= endAge)) {
-                    continue;
-                }
-                //Track Trade and Add the data of the teams
-                if (dataM.Tm != saveTeam && saveTeam != "") {
+                if ((dataM.age >= firstAge && dataM.age <= endAge)) {
 
-                    var yearColor = "";
+                    if (dataM.tm != saveTeam && saveTeam != "") {
 
-                    var valuesRGB = getGradientColor(dataRangeYear.color_from, dataRangeYear.color_to, endYear, firstYear, parseInt(dataM.year), opacityLine, dataM.playerName);
+                        var yearColor = "";
 
-                    yearColor = valuesRGB;
+                        var valuesRGB = getGradientColor(dataRangeYear.color_from, dataRangeYear.color_to, endYear, firstYear, parseInt(dataM.year), opacityLine, dataM.playerName);
 
-                    if (colorPlayer) {
-                        yearColor = dataModelNameDic[dataM.playerName].color;
+                        yearColor = valuesRGB;
+
+                        if (colorPlayer) {
+                            yearColor = dataModelNameDic[dataM.playerName].color;
+                        }
+
+                        var jsonStruc = {
+                            "from": saveTeam,
+                            "to": dataM.tm,
+                            "playerName": dataM.playerName,
+                            "year": dataM.year,
+                            "value": 1,
+                            "color": yearColor,
+                            "connectionNum": connectionNum,
+                            "age": dataM.age,
+                            "radDraw": 0,
+                            "finishDraw": false,
+                            "increaseSpeedDraw": (0.01 + (0.05 * Math.random())),
+                            "directionCharLeft": "<",
+                            "directionCharRight": ">",
+                            "mouseSelected": false
+                        }
+
+                        if (playerSelected.includes(jsonStruc.playerName) && onlyDrawSelected) {
+                            dataArray.push(jsonStruc);
+                            nameCounter++;
+                            connectionNum++;
+                            counterTotalConnections++;
+                        }
+
+                        if (!onlyDrawSelected) {
+
+                            dataArray.push(jsonStruc);
+                            nameCounter++;
+                            connectionNum++;
+                            counterTotalConnections++;
+                        }
                     }
-
-                    var jsonStruc = {
-                        "from": saveTeam,
-                        "to": dataM.tm,
-                        "playerName": dataM.playerName,
-                        "year": dataM.year,
-                        "value": 1,
-                        "color": yearColor,
-                        "connectionNum": connectionNum,
-                        "age": dataM.age,
-                        "radDraw": 0,
-                        "finishDraw": false,
-                        "increaseSpeedDraw": (0.01 + (0.05 * Math.random())),
-                        "directionCharLeft": "<",
-                        "directionCharRight": ">",
-                        "mouseSelected": false
-                    }
-
-                    if (playerSelected.includes(jsonStruc.playerName) && onlyDrawSelected) {
-                        dataArray.push(jsonStruc);
-                        connectionNum++;
-                        counterTotalConnections++;
-                    }
-
-                    if (!onlyDrawSelected) {
-
-                        dataArray.push(jsonStruc);
-                        connectionNum++;
-                        counterTotalConnections++;
-                    }
-
                     saveTeam = dataM.tm;
                 } else {
                     saveTeam = dataM.tm;
@@ -237,9 +274,6 @@ function pushToNamesRange(name) {
 function createNode() {
     createNodes();
     dataArray = dataArray.sort((a, b) => (a.year > b.year) ? 1 : -1);
-
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
     countDrawInterval = numberConnections;
 }
 
@@ -317,8 +351,9 @@ function createNodes() {
 }
 
 function drawAnimate() {
-    c.width = c.width;
+    //c.width = c.width;
     finishFlag = true;
+    drawClearRect();
     //Draw connections
     drawConnections();
     drawPlayersNeverTraded();
@@ -333,7 +368,16 @@ function drawAnimate() {
     imgData = ctx.getImageData(0, 0, c.width, c.height);
 }
 
+function drawClearRect() {
 
+    ctx.fillStyle = "rgba(255,255,255,1)";
+    ctx.rect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.fill();
+}
+
+function putSaveImage() {
+    ctx.putImageData(imgData, 0, 0);
+}
 
 function drawConnections() {
     for (var i = 0; i < countDrawInterval; i++) {
@@ -408,8 +452,6 @@ function drawConnections() {
             dataArray[i].finishDraw = true;
             finishFlag = true;
         }
-
-
 
         if (fillConnection) {
             ctx.fillStyle = nodeColor;
@@ -579,7 +621,7 @@ function sortNodes() {
 }
 
 function addOptionSelectors() {
-    console.log("Change Select");
+
     var options = [];
 
     for (var i = 0; i < playerInRange.length; i++) {
@@ -617,13 +659,13 @@ function getPlayersNeverTraded() {
         while (nameCounter < dataModel.length - 1) {
             nameCounter++;
             if (saveTeam == "") {
-                saveTeam = dataModel[nameCounter].Tm;
+                saveTeam = dataModel[nameCounter].tm;
                 continue;
             }
-            if (saveTeam != dataModel[nameCounter].Tm) {
+            if (saveTeam != dataModel[nameCounter].tm) {
                 connectionNum++;
             }
-            if (name != dataModel[nameCounter].Player) {
+            if (name != dataModel[nameCounter].playerName) {
                 break
             }
         }
@@ -702,12 +744,8 @@ $("#myCanvas").mouseup(function () {
     if (deSelectPlayerMouse || selectPlayerMouse) {
         changeDataAndSelector();
     }
-    c.width = c.width;
-    drawAnimate();
-});
 
-$("myCanvas").scroll(function () {
-    console.log("Hola");
+    drawAnimate();
 });
 
 $("#myCanvas").mousemove(function (event) {
@@ -715,7 +753,7 @@ $("#myCanvas").mousemove(function (event) {
     mousePosY = event.pageY;
 
     if (mouseDown) {
-        ctx.putImageData(imgData, 0, 0);
+        putSaveImage();
         ctx.beginPath()
         ctx.strokeStyle = "#FF0000";
         ctx.strokeWidth = 5;
@@ -732,7 +770,6 @@ $("#rangeZoom").change(function () {
     offsetX = 200 - zoom * 10;
     changeData();
 });
-
 
 function drawConnectionOverTeams() {
     var dataTeamsConnections = [];
@@ -786,7 +823,6 @@ function drawConnectionOverTeams() {
         }
     }
 
-    console.log(dataArray);
     var yearStatsArray = [];
     var sumCheck = 0;
     for (var i = 18; i < 44; i++) {
@@ -794,16 +830,13 @@ function drawConnectionOverTeams() {
         for (var ii = 0; ii < dataArray.length; ii++) {
             if (dataArray[ii].age == i && !playersNotTraded.includes(dataArray[ii].playerName)) {
                 yearStatsArray[i] = yearStatsArray[i] + 1;
+                sumCheck++;
             }
         }
-        sumCheck += yearStatsArray[i];
+
     }
 
-    console.log(sumCheck);
-    console.log(yearStatsArray);
-
     var avg = Math.round(countTotalConnections / playerCounter * 100) / 100;
-
     var x = offsetX;
     var y = 300;
     var offSetText = 15;
@@ -812,7 +845,6 @@ function drawConnectionOverTeams() {
     ctx.fillText("Max Trades:" + max, x, y);
     ctx.fillText("Player:" + playerName, x, y + offSetText);
     ctx.fillText("Avg trades:" + avg, x, y + offSetText * 2);
-
 }
 
 

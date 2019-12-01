@@ -63,14 +63,19 @@
 
             for (var j = 0; j < rangeArray.length; j++) {
                 var selectRange = rangeArray[j];
-                /*$(selectRange).draggable({
+                $(selectRange).draggable({
                     axis: "x",
                     containment: uiTokenBar,
                     stack: ".IO-UI-range",
                     drag: function (event, ui) {
                         colorPicker.hide();
+                        moveEntireRange(this);
+                    },
+                    stop: function (event, ui) {
+                        getDataRanges();
+                        changeDataAndSelector();
                     }
-                });*/
+                });
 
             }
 
@@ -94,19 +99,35 @@
                         colorPicker.hide();
                         changeUIDragElements($(this));
                         $(this).attr("data-year", setValueText($(this)));
-                        moveRange(this);
+                        moveTokenAndRange(this);
                     },
                     stop: function (event, ui) {
                         getDataRanges();
                         changeDataAndSelector();
                     }
                 });
-
-                moveRange(selectToken);
             }
         }
 
-        function moveRange(token) {
+        function moveEntireRange(range) {
+            var tokensArray = $(range).find(".IO-UI-token");
+
+            if ($(tokensArray[0]).offset().left < $(tokensArray[1]).offset().left) {
+                $(tokensArray[0]).css("left", $(range).offset().left + 5);
+                $(tokensArray[1]).css("left", $(range).offset().left + $(range).width() - $(tokensArray[1]).width() - 5);
+            } else {
+                $(tokensArray[1]).css("left", $(range).offset().left + 5);
+                $(tokensArray[0]).css("left", $(range).offset().left + $(range).width() - $(tokensArray[0]).width() - 5);
+            }
+
+            $(tokensArray[0]).attr("data-year", setValueText($(tokensArray[0])));
+            $(tokensArray[1]).attr("data-year", setValueText($(tokensArray[1])));
+
+            changeUIDragElements($(tokensArray[0]));
+            changeUIDragElements($(tokensArray[1]));
+        }
+
+        function moveTokenAndRange(token) {
             var range = $(token).parent();
             var tokensChilds = $(range).find(".IO-UI-token");
             var min = 10000000;
@@ -145,24 +166,15 @@
         function addToken() {
             changeInfoTextFade("Token added");
             var range = '<div class="IO-UI-range" data-first="" data-end=""><div class="IO-UI-token" data-year="1950"><p class="IO-UI-token-text">100</p></div><div class="IO-UI-token" data-year="1953"><p class="IO-UI-token-text">100</p></div></div>';
-            //$(uiTokenContainer).append("<div class='IO-UI-token'  data-year='100'><p class='IO-UI-token-text'>100</p></div>");
+
             $(uiTokenContainer).append(range);
-            setTokenPositionByValue();
             makeDragables();
+            setTokenPositionByValue();
             changeData();
-        }
-
-        function addRange() {
-
-            changeInfoText("Pick 1st Token");
         }
 
         $("#IO-UI-add-token").click(function () {
             addToken();
-        });
-
-        $("#IO-UI-add-range").click(function () {
-            addRange();
         });
 
         $(".IO-UI-delete-btn").click(function () {
@@ -187,7 +199,7 @@
                 var year = $(mToke).attr("data-year");
                 $(mToke).css("left", (uiTokenBar.offset().left) + ((uiTokenBar.width() - ofsetTokenPos) * ((year - min) / (max - min))));
                 changeUIDragElements($(mToke))
-                moveRange($(mToke));
+                moveTokenAndRange($(mToke));
             }
             reCalculeValues();
         });
@@ -205,6 +217,7 @@
         setTokenPositionByValue();
 
         function setTokenPositionByValue() {
+            //console.log("Set Token Position by Value");
             var tokensArray = uiTokenContainer.find(".IO-UI-token");
 
             for (var i = 0; i < tokensArray.length; i++) {
@@ -215,11 +228,12 @@
                 var left = barPos + barW * ((data - min) / (max - min));
                 $(selectToken).css("left", left);
                 changeUIDragElements($(selectToken));
-                moveRange(selectToken);
+                moveTokenAndRange(selectToken);
             }
         }
 
         function getDataRanges() {
+            console.log("Get data ranges");
             var rangeArrayHTML = uiTokenContainer.find(".IO-UI-range");
             var rangeArray = [];
 
@@ -255,6 +269,7 @@
                 rangeArray.push(rangeObj);
 
             }
+            console.log(rangeArray.length);
             //console.log(rangeArray);
             return rangeArray;
         }
